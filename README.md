@@ -1,205 +1,146 @@
-# Mock.shop Hydrogen Clone
+# Hydrogen Vercel Starter
 
-> **The first complete Hydrogen-based replica of Shopify's official demo store (demostore.mock.shop)**
+A production-ready Shopify Hydrogen starter optimized for Vercel deployment. Works out of the box with `mock.shop` - no Shopify account needed to try it.
 
-This project demonstrates how to transform a standard Hydrogen template into a production-quality storefront that perfectly aligns with Shopify's Hydrogen protocols, component architecture, and best practices.
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/nathanmcmullendev/hydrogen-mockshop-clone&env=SESSION_SECRET,PUBLIC_STORE_DOMAIN&envDescription=Required%20environment%20variables&envLink=https://github.com/nathanmcmullendev/hydrogen-mockshop-clone%23environment-variables&project-name=hydrogen-store&repository-name=hydrogen-store)
 
 **Live Demo:** https://hydrogen-vercel-fresh.vercel.app
-**Reference:** https://demostore.mock.shop
 
 ---
 
-## Why This Matters
+## Features
 
-Shopify's `demostore.mock.shop` is built with the Dawn theme (Liquid). This project proves you can achieve **pixel-perfect parity** using Hydrogen (React/Remix) while following all official patterns:
+- **Vercel-optimized** - Deploys with zero configuration
+- **Full e-commerce** - Collections, products, cart, checkout
+- **Search** - Product search with filters
+- **Responsive** - Mobile-first design
+- **TypeScript** - Full type safety
+- **SEO Ready** - Meta tags, sitemap, robots.txt
+- **Customer accounts** - Login, register, order history
 
-- **Hydrogen Components**: `<Image>`, `<Money>`, `<CartForm>`, `VariantSelector`
-- **Remix Patterns**: `loader`, `defer`, `Await`, `Suspense`
-- **Storefront API**: GraphQL queries with proper fragments
-- **Vercel Deployment**: Zero-config deployment with environment variables
+## Quick Start
 
----
+### Try without Shopify account
 
-## What's Included
-
-### Pages
-| Route | Description |
-|-------|-------------|
-| `/` | Homepage with hero, new arrivals, brand values, midweight section, newsletter |
-| `/collections` | All collections grid |
-| `/collections/:handle` | Collection detail with product grid |
-| `/products/:handle` | Product detail with variants, zoom lightbox, add to cart |
-| `/search` | Search results page with filters |
-| `/cart` | Cart aside drawer |
-| `/account/*` | Account pages (login, orders, addresses) |
-
-### Components
-| Component | Location | Purpose |
-|-----------|----------|---------|
-| `Layout` | `app/components/Layout.tsx` | Main layout with header, cart aside, search dropdown, mobile menu |
-| `Header` | `app/components/Header.tsx` | Navigation with Liquid logo, search, cart icons |
-| `Footer` | `app/components/Footer.tsx` | Newsletter, social links, locale selectors |
-| `Aside` | `app/components/Aside.tsx` | Reusable drawer (left/right positioning) |
-| `Cart` | `app/components/Cart.tsx` | Cart functionality with quantity controls |
-| `Search` | `app/components/Search.tsx` | Predictive search with results |
-
-### Key Features Implemented
-- [x] **Search Dropdown** - Top dropdown with bordered input, floating label (matches Dawn theme)
-- [x] **Product Zoom** - Working lightbox modal when clicking zoom icon
-- [x] **Variant Selector** - Color swatches + size buttons with URL-based state
-- [x] **Quantity Selector** - Increment/decrement with cart integration
-- [x] **Cart Drawer** - Slide-in cart with line items and checkout
-- [x] **Mobile Menu** - Left-sliding menu with navigation and social links
-- [x] **Responsive Design** - Mobile-first CSS matching mock.shop breakpoints
-
----
-
-## Architecture
-
-```
-hydrogen-vercel-fresh/
-├── app/
-│   ├── components/
-│   │   ├── Layout.tsx      # Main layout wrapper
-│   │   ├── Header.tsx      # Site header with navigation
-│   │   ├── Footer.tsx      # Site footer
-│   │   ├── Aside.tsx       # Drawer component (cart, menu)
-│   │   ├── Cart.tsx        # Cart functionality
-│   │   └── Search.tsx      # Predictive search
-│   ├── routes/
-│   │   ├── _index.tsx      # Homepage
-│   │   ├── collections._index.tsx
-│   │   ├── collections.$handle.tsx
-│   │   ├── products.$handle.tsx
-│   │   ├── search.tsx
-│   │   ├── cart.tsx
-│   │   └── account.*.tsx   # Account routes
-│   ├── styles/
-│   │   └── app.css         # All styles (no Tailwind)
-│   └── root.tsx            # App root with providers
-├── public/
-├── storefrontapi.generated.d.ts  # Generated types
-└── vercel.json             # Vercel config with env vars
+```bash
+git clone https://github.com/nathanmcmullendev/hydrogen-mockshop-clone.git
+cd hydrogen-mockshop-clone
+npm install --legacy-peer-deps
+npm run dev
 ```
 
-### Data Flow
+Uses `mock.shop` by default - no Shopify account needed!
 
+Open http://localhost:3000
+
+### Connect your Shopify store
+
+1. Create a Hydrogen storefront in Shopify Admin
+2. Go to Settings > Apps > Develop apps > Create app
+3. Configure Storefront API access
+4. Copy your credentials to `.env`:
+
+```bash
+cp .env.example .env
 ```
-User Request
-     ↓
-Remix Loader (server)
-     ↓
-Storefront API Query (GraphQL)
-     ↓
-Deferred Data (streaming)
-     ↓
-React Components (client)
-     ↓
-Hydrogen Components render
+
+```env
+SESSION_SECRET="your-secret-key-min-32-chars"
+PUBLIC_STORE_DOMAIN="your-store.myshopify.com"
+PUBLIC_STOREFRONT_API_TOKEN="your-storefront-token"
 ```
 
 ---
 
-## Hydrogen Patterns Used
+## Deploy to Vercel
 
-### 1. Deferred Loading
-```tsx
-// In loader
-export async function loader({context}: LoaderArgs) {
-  const criticalData = await storefront.query(CRITICAL_QUERY);
-  const deferredData = storefront.query(DEFERRED_QUERY); // No await
-  return defer({criticalData, deferredData});
-}
+### Option 1: One-Click Deploy
 
-// In component
-<Suspense fallback={<Loading />}>
-  <Await resolve={deferredData}>
-    {(data) => <Component data={data} />}
-  </Await>
-</Suspense>
+Click the button at the top of this README. You'll need to set:
+
+| Variable | Value |
+|----------|-------|
+| `SESSION_SECRET` | Any string, min 32 characters |
+| `PUBLIC_STORE_DOMAIN` | `mock.shop` or `your-store.myshopify.com` |
+
+### Option 2: CLI Deploy
+
+```bash
+npm i -g vercel
+vercel
 ```
 
-### 2. Cart Form Actions
-```tsx
-<CartForm
-  route="/cart"
-  inputs={{lines}}
-  action={CartForm.ACTIONS.LinesAdd}
->
-  {(fetcher) => (
-    <button type="submit" disabled={fetcher.state !== 'idle'}>
-      Add to cart
-    </button>
-  )}
-</CartForm>
-```
-
-### 3. Variant Selector with URL State
-```tsx
-<VariantSelector
-  handle={product.handle}
-  options={product.options}
-  variants={variants}
->
-  {({option}) => (
-    <Link to={option.to} preventScrollReset replace>
-      {option.value}
-    </Link>
-  )}
-</VariantSelector>
-```
-
-### 4. Image Component with Optimization
-```tsx
-<Image
-  data={image}
-  aspectRatio="1/1"
-  sizes="(min-width: 45em) 50vw, 100vw"
-/>
-```
-
----
-
-## CSS Architecture
-
-All styles in `app/styles/app.css` follow mock.shop's design system:
-
-```css
-:root {
-  --color-background: #f3f3f3;
-  --color-background-alt: #ffffff;
-  --color-text: #000000;
-  --color-text-muted: #707070;
-  --color-border: #e0e0e0;
-  --header-height: 100px;
-  --aside-width: 400px;
-  --radius-product: 12px;
-}
-```
-
-### Key CSS Patterns
-- **CSS-only drawers**: Using `:target` pseudo-class for cart/menu
-- **Floating labels**: Using `:placeholder-shown` for search input
-- **Grid layouts**: CSS Grid for header (3-column) and product grids
-- **Aspect ratios**: Native `aspect-ratio` for consistent image sizing
+Add environment variables in the Vercel dashboard under Project Settings > Environment Variables.
 
 ---
 
 ## Environment Variables
 
-```env
-SESSION_SECRET=your-secret-key
-PUBLIC_STOREFRONT_API_TOKEN=your-storefront-token
-PUBLIC_STORE_DOMAIN=mock.shop
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `SESSION_SECRET` | Yes | Session encryption key (min 32 chars) |
+| `PUBLIC_STORE_DOMAIN` | Yes | `mock.shop` or `your-store.myshopify.com` |
+| `PUBLIC_STOREFRONT_API_TOKEN` | For real stores | Storefront API public token |
+| `PRIVATE_STOREFRONT_API_TOKEN` | Optional | Storefront API private token |
+
+See `.env.example` for full documentation.
+
+---
+
+## Project Structure
+
+```
+app/
+├── components/
+│   ├── Aside.tsx       # Drawer component (cart, menu)
+│   ├── Cart.tsx        # Cart functionality
+│   ├── Footer.tsx      # Site footer
+│   ├── Header.tsx      # Site header with navigation
+│   ├── Layout.tsx      # Main layout wrapper
+│   └── Search.tsx      # Predictive search
+├── routes/
+│   ├── _index.tsx              # Homepage
+│   ├── cart.tsx                # Cart page
+│   ├── collections._index.tsx  # All collections
+│   ├── collections.$handle.tsx # Collection detail
+│   ├── products.$handle.tsx    # Product detail
+│   ├── search.tsx              # Search results
+│   └── $.tsx                   # 404 page
+├── styles/
+│   └── app.css         # All styles
+└── root.tsx            # App root with providers
 ```
 
 ---
 
-## Local Development
+## Pages Included
+
+| Route | Description |
+|-------|-------------|
+| `/` | Homepage with hero, featured products, newsletter |
+| `/collections` | All collections grid |
+| `/collections/:handle` | Collection with product grid |
+| `/products/:handle` | Product page with variants, zoom, add to cart |
+| `/search` | Search with filters |
+| `/cart` | Cart drawer |
+| `/account/*` | Customer account pages |
+
+---
+
+## Tech Stack
+
+- [Hydrogen](https://hydrogen.shopify.dev/) - Shopify's React framework
+- [Remix](https://remix.run/) - Full-stack web framework
+- [Vercel](https://vercel.com/) - Deployment platform
+- [TypeScript](https://www.typescriptlang.org/) - Type safety
+
+---
+
+## Development
 
 ```bash
 # Install dependencies
-npm install
+npm install --legacy-peer-deps
 
 # Start dev server
 npm run dev
@@ -207,30 +148,40 @@ npm run dev
 # Build for production
 npm run build
 
-# Deploy to Vercel
-npx vercel --prod
+# Preview production build
+npm run preview
+
+# Type check
+npm run typecheck
+
+# Lint
+npm run lint
 ```
 
 ---
 
-## Differences from Dawn Theme
+## Why This Starter?
 
-| Aspect | Dawn (Liquid) | This Project (Hydrogen) |
-|--------|---------------|-------------------------|
-| Framework | Shopify Liquid | Remix + React |
-| Data Fetching | Liquid objects | GraphQL + Storefront API |
-| Styling | CSS + Liquid | Pure CSS |
-| Cart | AJAX + Liquid | CartForm + Remix actions |
-| Search | Predictive Search API | Same API, React components |
-| Deployment | Shopify hosting | Vercel (or any Node host) |
+Deploying Hydrogen to Vercel has been a documented pain point for 3+ years. This starter:
+
+- Pre-applies all required Vercel configuration
+- Works with `mock.shop` out of the box
+- No paid CMS or platform lock-in required
+- One-click deploy to Vercel
+
+See [MARKET-RESEARCH-VERCEL-DEPLOYMENT.md](./MARKET-RESEARCH-VERCEL-DEPLOYMENT.md) for the full research.
 
 ---
 
-## Credits
+## Contributing
 
-- **Shopify** - Hydrogen framework, Storefront API, mock.shop demo
-- **Vercel** - Hosting and deployment
-- **Dawn Theme** - Design reference (open source)
+Issues and PRs welcome. Please test your changes with:
+
+```bash
+npm run build
+npm run typecheck
+npm run lint
+```
 
 ---
 

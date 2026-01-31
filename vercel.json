@@ -1,7 +1,21 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "npm install --legacy-peer-deps",
+  "buildCommand": "npm run build",
+  "framework": null,
   "env": {
     "SESSION_SECRET": "hydrogen-mock-shop-session-secret-2026",
     "PUBLIC_STORE_DOMAIN": "mock.shop"
-  }
+  },
+  "headers": [
+    {
+      "source": "/build/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ]
 }

@@ -2220,3 +2220,134 @@ main {
   display: block;
   margin-bottom: 32px;
 }
+
+/* ====== 404 Page ====== */
+.not-found-page {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-desktop);
+  background: var(--color-background-alt);
+}
+
+.not-found-content {
+  text-align: center;
+  max-width: 500px;
+}
+
+.not-found-title {
+  font-size: 120px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-text);
+  margin-bottom: 16px;
+}
+
+.not-found-subtitle {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.not-found-description {
+  font-size: 16px;
+  color: var(--color-text-muted);
+  margin-bottom: 32px;
+}
+
+.not-found-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.not-found-button {
+  display: inline-block;
+  padding: 14px 28px;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: var(--radius-button);
+  transition: all 0.2s ease;
+}
+
+.not-found-button.primary {
+  background: var(--color-text);
+  color: var(--color-background-alt);
+}
+
+.not-found-button.primary:hover {
+  opacity: 0.85;
+}
+
+.not-found-button.secondary {
+  background: transparent;
+  color: var(--color-text);
+  border: 1px solid var(--color-text);
+}
+
+.not-found-button.secondary:hover {
+  background: var(--color-text);
+  color: var(--color-background-alt);
+}
+
+/* ====== Error Boundary ====== */
+.route-error {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-desktop);
+  text-align: center;
+}
+
+.route-error h1 {
+  font-size: 48px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.route-error h2 {
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  margin-bottom: 24px;
+}
+
+.route-error fieldset {
+  border: 1px solid var(--color-border);
+  padding: 16px 24px;
+  max-width: 600px;
+  border-radius: 4px;
+  background: #fff8f8;
+}
+
+.route-error pre {
+  font-family: monospace;
+  font-size: 13px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: #c00;
+}
+
+@media (max-width: 767px) {
+  .not-found-title {
+    font-size: 80px;
+  }
+
+  .not-found-subtitle {
+    font-size: 22px;
+  }
+
+  .not-found-actions {
+    flex-direction: column;
+  }
+
+  .not-found-button {
+    width: 100%;
+    text-align: center;
+  }
+}

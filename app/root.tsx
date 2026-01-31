@@ -102,40 +102,102 @@ export default function App() {
 export function ErrorBoundary() {
   const error = useRouteError();
   const [root] = useMatches();
-  let errorMessage = 'Unknown error';
+  let errorMessage = 'Something went wrong';
   let errorStatus = 500;
+  let errorTitle = 'Oops!';
 
   if (isRouteErrorResponse(error)) {
     errorMessage = error?.data?.message ?? error.data;
     errorStatus = error.status;
+
+    if (errorStatus === 404) {
+      errorTitle = 'Page Not Found';
+      errorMessage = "The page you're looking for doesn't exist.";
+    } else if (errorStatus === 500) {
+      errorTitle = 'Server Error';
+    }
   } else if (error instanceof Error) {
     errorMessage = error.message;
   }
+
+  const rootData = root?.data as any;
 
   return (
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>{errorTitle} | Mock.shop</title>
         <Meta />
         <Links />
       </head>
       <body>
-        <Layout {...root.data}>
-          <div className="route-error">
-            <h1>Oops</h1>
-            <h2>{errorStatus}</h2>
-            {errorMessage && (
-              <fieldset>
-                <pre>{errorMessage}</pre>
-              </fieldset>
-            )}
-          </div>
-        </Layout>
+        {rootData ? (
+          <Layout {...rootData}>
+            <ErrorContent
+              status={errorStatus}
+              title={errorTitle}
+              message={errorMessage}
+            />
+          </Layout>
+        ) : (
+          <ErrorContent
+            status={errorStatus}
+            title={errorTitle}
+            message={errorMessage}
+          />
+        )}
         <ScrollRestoration />
         <Scripts />
       </body>
     </html>
+  );
+}
+
+function ErrorContent({
+  status,
+  title,
+  message,
+}: {
+  status: number;
+  title: string;
+  message: string;
+}) {
+  return (
+    <div className="route-error">
+      <h1>{title}</h1>
+      <h2>{status}</h2>
+      <p style={{marginBottom: '24px', color: '#707070'}}>{message}</p>
+      <div style={{display: 'flex', gap: '16px', justifyContent: 'center'}}>
+        <a
+          href="/"
+          style={{
+            display: 'inline-block',
+            padding: '14px 28px',
+            background: '#000',
+            color: '#fff',
+            textDecoration: 'none',
+            borderRadius: '2px',
+          }}
+        >
+          Go to Homepage
+        </a>
+        <a
+          href="/collections"
+          style={{
+            display: 'inline-block',
+            padding: '14px 28px',
+            background: 'transparent',
+            color: '#000',
+            textDecoration: 'none',
+            borderRadius: '2px',
+            border: '1px solid #000',
+          }}
+        >
+          Browse Collections
+        </a>
+      </div>
+    </div>
   );
 }
 
