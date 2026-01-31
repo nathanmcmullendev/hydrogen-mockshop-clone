@@ -36,7 +36,7 @@ function HeroSection() {
   return (
     <section className="hero-section">
       <img
-        src="https://cdn.shopify.com/s/files/1/0688/1755/1382/files/Hero_3b621985-93ab-4f44-8b47-860e29b5027c.jpg?v=1675456354"
+        src="https://demostore.mock.shop/cdn/shop/files/DALL_E_2023-02-03_11.19.22_-_basketball_gym_5_1.png?v=1675445658&width=1500"
         alt="The Peak Collection"
       />
       <div className="hero-content">
@@ -91,7 +91,7 @@ function LifestyleSection() {
     <section className="lifestyle-section">
       <div className="lifestyle-image">
         <img
-          src="https://cdn.shopify.com/s/files/1/0688/1755/1382/files/Midweight_1.jpg?v=1675456899"
+          src="https://demostore.mock.shop/cdn/shop/files/second.jpg?v=1675442050&width=800"
           alt="Lifestyle"
         />
       </div>
@@ -104,7 +104,7 @@ function LifestyleSection() {
       </div>
       <div className="lifestyle-image">
         <img
-          src="https://cdn.shopify.com/s/files/1/0688/1755/1382/files/Midweight_2.jpg?v=1675456929"
+          src="https://demostore.mock.shop/cdn/shop/files/second.jpg?v=1675442050&width=800"
           alt="Lifestyle"
         />
       </div>
