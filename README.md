@@ -10,6 +10,7 @@ A production-ready Shopify Hydrogen starter optimized for Vercel deployment. Wor
 
 ## Features
 
+- **Metaobjects CMS** - 14 section types for visual page building (free alternative to $49+ templates)
 - **Vercel-optimized** - Deploys with zero configuration
 - **Full e-commerce** - Collections, products, cart, checkout
 - **Search** - Product search with filters
@@ -17,6 +18,7 @@ A production-ready Shopify Hydrogen starter optimized for Vercel deployment. Wor
 - **TypeScript** - Full type safety
 - **SEO Ready** - Meta tags, sitemap, robots.txt
 - **Customer accounts** - Login, register, order history
+- **Static fallback** - Works without metaobjects configured
 
 ## Quick Start
 
@@ -87,6 +89,26 @@ See `.env.example` for full documentation.
 
 ---
 
+## Metaobjects CMS (14 Section Types)
+
+This template includes a free, open-source CMS layer powered by Shopify Metaobjects - matching premium templates like Ciseco ($49).
+
+| Category | Sections |
+|----------|----------|
+| **Hero** | Hero, Hero Slider |
+| **Products** | Featured Products, Collection Grid |
+| **Content** | Rich Text, Image With Text, Video |
+| **Social Proof** | Testimonials, Logos |
+| **Utility** | FAQ, Features, Banner, Countdown, Newsletter |
+
+**How it works:**
+- Without metaobjects → renders beautiful static homepage
+- With metaobjects → renders CMS-driven content
+
+See [app/sections/README.md](./app/sections/README.md) for full documentation and metaobject definitions.
+
+---
+
 ## Project Structure
 
 ```
@@ -98,8 +120,14 @@ app/
 │   ├── Header.tsx      # Site header with navigation
 │   ├── Layout.tsx      # Main layout wrapper
 │   └── Search.tsx      # Predictive search
+├── sections/           # Metaobjects CMS (14 section types)
+│   ├── Sections.tsx    # Dynamic section router
+│   ├── RouteContent.tsx # Route query component
+│   ├── SectionHero.tsx
+│   ├── SectionFeaturedProducts.tsx
+│   └── ...             # 12 more sections
 ├── routes/
-│   ├── _index.tsx              # Homepage
+│   ├── _index.tsx              # Homepage (with CMS support)
 │   ├── cart.tsx                # Cart page
 │   ├── collections._index.tsx  # All collections
 │   ├── collections.$handle.tsx # Collection detail
@@ -108,6 +136,8 @@ app/
 │   └── $.tsx                   # 404 page
 ├── styles/
 │   └── app.css         # All styles
+├── utils/
+│   └── parseSection.ts # Metafield parser utility
 └── root.tsx            # App root with providers
 ```
 
@@ -166,10 +196,11 @@ Deploying Hydrogen to Vercel has been a documented pain point for 3+ years. This
 
 - Pre-applies all required Vercel configuration
 - Works with `mock.shop` out of the box
+- **Free Metaobjects CMS** matching $49-299 premium templates
 - No paid CMS or platform lock-in required
 - One-click deploy to Vercel
 
-See [MARKET-RESEARCH-VERCEL-DEPLOYMENT.md](./MARKET-RESEARCH-VERCEL-DEPLOYMENT.md) for the full research.
+See [MARKET-RESEARCH-VERCEL-DEPLOYMENT.md](./MARKET-RESEARCH-VERCEL-DEPLOYMENT.md) for deployment research and [COMPETITIVE-ANALYSIS.md](./COMPETITIVE-ANALYSIS.md) for template comparison.
 
 ---
 
