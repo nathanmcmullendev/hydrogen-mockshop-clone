@@ -7,6 +7,12 @@ import type {
   FeaturedCollectionFragment,
   RecommendedProductsQuery,
 } from 'storefrontapi.generated';
+import {
+  RouteContent,
+  ROUTE_CONTENT_QUERY,
+  hasRouteContent,
+  type RouteContentData,
+} from '~/sections';
 
 export const meta: V2_MetaFunction = () => {
   return [{title: 'Mock.shop | Home'}];
@@ -14,15 +20,40 @@ export const meta: V2_MetaFunction = () => {
 
 export async function loader({context}: LoaderArgs) {
   const {storefront} = context;
+
+  // Try to load CMS content from metaobjects
+  let route: RouteContentData | null = null;
+  try {
+    const {route: routeData} = await storefront.query(ROUTE_CONTENT_QUERY, {
+      variables: {handle: 'route-home'},
+    });
+    route = routeData;
+  } catch (error) {
+    // Metaobjects not configured - will use static fallback
+    console.log('No metaobjects configured, using static homepage');
+  }
+
+  // Always load product data for static fallback
   const {collections} = await storefront.query(FEATURED_COLLECTION_QUERY);
   const featuredCollection = collections.nodes[0];
   const recommendedProducts = storefront.query(RECOMMENDED_PRODUCTS_QUERY);
 
-  return defer({featuredCollection, recommendedProducts});
+  return defer({route, featuredCollection, recommendedProducts});
 }
 
 export default function Homepage() {
   const data = useLoaderData<typeof loader>();
+
+  // If CMS content exists, use it
+  if (hasRouteContent(data.route)) {
+    return (
+      <div className="home">
+        <RouteContent route={data.route} />
+      </div>
+    );
+  }
+
+  // Otherwise, render the static homepage
   return (
     <div className="home">
       <HeroSection />
