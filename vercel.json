@@ -2,7 +2,17 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "npm install --legacy-peer-deps",
   "buildCommand": "npm run build",
+  "outputDirectory": "dist/client",
   "framework": null,
+  "functions": {
+    "dist/worker/index.js": {
+      "runtime": "@vercel/node@3.0.0",
+      "includeFiles": "dist/worker/**"
+    }
+  },
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/dist/worker/index.js" }
+  ],
   "env": {
     "SESSION_SECRET": "hydrogen-mock-shop-session-secret-2026",
     "PUBLIC_STORE_DOMAIN": "mock.shop"
