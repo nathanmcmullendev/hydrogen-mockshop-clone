@@ -10,17 +10,30 @@ export function Header({header, isLoggedIn, cart}: HeaderProps) {
   const {shop, menu} = header;
   return (
     <header className="header">
-      <HeaderMenu menu={menu} viewport="desktop" />
+      {/* LEFT: Mobile hamburger OR Desktop nav */}
+      <div className="header-left">
+        <HeaderMenuMobileToggle />
+        <HeaderMenu menu={menu} viewport="desktop" />
+      </div>
+
+      {/* CENTER: Liquid logo (hard-coded GIF from mock.shop) */}
       <div className="header-logo">
         <NavLink prefetch="intent" to="/" end>
-          {shop.brand?.logo?.image?.url ? (
-            <img src={shop.brand.logo.image.url} alt={shop.name} />
-          ) : (
-            <span className="header-logo-text">{shop.name}</span>
-          )}
+          <img
+            src="https://demostore.mock.shop/cdn/shop/files/newer.gif?v=1675451764"
+            alt="Liquid"
+          />
         </NavLink>
       </div>
-      <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} />
+
+      {/* RIGHT: Search + Account + Cart */}
+      <div className="header-right">
+        <SearchToggle />
+        <NavLink prefetch="intent" to="/account" className="header-account-link">
+          <AccountIcon />
+        </NavLink>
+        <CartToggle cart={cart} />
+      </div>
     </header>
   );
 }
@@ -83,21 +96,7 @@ export function HeaderMenu({
   );
 }
 
-function HeaderCtas({
-  isLoggedIn,
-  cart,
-}: Pick<HeaderProps, 'isLoggedIn' | 'cart'>) {
-  return (
-    <nav className="header-ctas" role="navigation">
-      <HeaderMenuMobileToggle />
-      <SearchToggle />
-      <NavLink prefetch="intent" to="/account" style={activeLinkStyle}>
-        <AccountIcon />
-      </NavLink>
-      <CartToggle cart={cart} />
-    </nav>
-  );
-}
+// HeaderCtas removed - functionality moved to header-left and header-right divs
 
 function HeaderMenuMobileToggle() {
   return (

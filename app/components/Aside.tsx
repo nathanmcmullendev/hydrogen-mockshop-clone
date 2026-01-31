@@ -2,15 +2,18 @@ import {useEffect} from 'react';
 
 /**
  * A side bar component with Overlay
+ * Supports both left (menu) and right (cart/search) positioning
  */
 export function Aside({
   children,
   heading,
   id = 'aside',
+  position = 'right',
 }: {
   children?: React.ReactNode;
   heading: React.ReactNode;
   id?: string;
+  position?: 'left' | 'right';
 }) {
   useEffect(() => {
     // Close aside when pressing Escape
@@ -28,7 +31,12 @@ export function Aside({
   };
 
   return (
-    <div aria-modal className="overlay" id={id} role="dialog">
+    <div
+      aria-modal
+      className={`overlay ${position === 'left' ? 'overlay-left' : ''}`}
+      id={id}
+      role="dialog"
+    >
       <div
         className="close-outside"
         onClick={handleCloseOutside}
@@ -37,10 +45,19 @@ export function Aside({
         tabIndex={0}
         aria-label="Close"
       />
-      <aside>
+      <aside className={position === 'left' ? 'aside-left' : ''}>
         <header>
-          <h3>{heading}</h3>
-          <CloseAside />
+          {position === 'left' ? (
+            <>
+              <CloseAside />
+              <div className="aside-header-spacer" />
+            </>
+          ) : (
+            <>
+              <h3>{heading}</h3>
+              <CloseAside />
+            </>
+          )}
         </header>
         <main>{children}</main>
       </aside>

@@ -1,4 +1,4 @@
-import {Suspense} from 'react';
+import React, {Suspense} from 'react';
 import type {V2_MetaFunction} from '@shopify/remix-oxygen';
 import {defer, redirect, type LoaderArgs} from '@shopify/remix-oxygen';
 import type {FetcherWithComponents} from '@remix-run/react';
@@ -122,19 +122,77 @@ export default function Product() {
 }
 
 function ProductImage({image}: {image: ProductVariantFragment['image']}) {
+  const [isZoomed, setIsZoomed] = React.useState(false);
+
   if (!image) {
     return <div className="product-image" />;
   }
+
   return (
-    <div className="product-image">
-      <Image
-        alt={image.altText || 'Product Image'}
-        aspectRatio="1/1"
-        data={image}
-        key={image.id}
-        sizes="(min-width: 45em) 50vw, 100vw"
-      />
-    </div>
+    <>
+      <div className="product-image">
+        <button
+          className="product-image-zoom"
+          aria-label="Zoom image"
+          onClick={() => setIsZoomed(true)}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.3-4.3"></path>
+            <path d="M11 8v6"></path>
+            <path d="M8 11h6"></path>
+          </svg>
+        </button>
+        <Image
+          alt={image.altText || 'Product Image'}
+          aspectRatio="1/1"
+          data={image}
+          key={image.id}
+          sizes="(min-width: 45em) 50vw, 100vw"
+        />
+        <div className="product-image-pagination">
+          <button className="pagination-arrow" disabled aria-label="Previous image">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="m15 18-6-6 6-6"/>
+            </svg>
+          </button>
+          <span className="pagination-indicator">1/1</span>
+          <button className="pagination-arrow" disabled aria-label="Next image">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="m9 18 6-6-6-6"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* Image Zoom Lightbox */}
+      {isZoomed && (
+        <div
+          className="product-lightbox"
+          onClick={() => setIsZoomed(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Zoomed product image"
+        >
+          <button
+            className="product-lightbox-close"
+            onClick={() => setIsZoomed(false)}
+            aria-label="Close zoom"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M18 6 6 18M6 6l12 12"/>
+            </svg>
+          </button>
+          <div className="product-lightbox-content" onClick={(e) => e.stopPropagation()}>
+            <img
+              src={image.url}
+              alt={image.altText || 'Product Image'}
+              className="product-lightbox-image"
+            />
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
@@ -147,10 +205,9 @@ function ProductMain({
   selectedVariant: ProductFragment['selectedVariant'];
   variants: Promise<ProductVariantsQuery>;
 }) {
-  const {title, descriptionHtml, vendor} = product;
+  const {title, descriptionHtml} = product;
   return (
     <div className="product-main">
-      {vendor && <p className="product-vendor">{vendor}</p>}
       <h1>{title}</h1>
       <ProductPrice selectedVariant={selectedVariant} />
       <Suspense
@@ -209,6 +266,9 @@ function ProductPrice({
           </span>
         )
       )}
+      <p className="product-shipping-notice">
+        <Link to="/policies/shipping-policy">Shipping</Link> calculated at checkout.
+      </p>
     </div>
   );
 }
@@ -222,6 +282,16 @@ function ProductForm({
   selectedVariant: ProductFragment['selectedVariant'];
   variants: Array<ProductVariantFragment>;
 }) {
+  const [quantity, setQuantity] = React.useState(1);
+
+  const decreaseQuantity = () => {
+    if (quantity > 1) setQuantity(quantity - 1);
+  };
+
+  const increaseQuantity = () => {
+    setQuantity(quantity + 1);
+  };
+
   return (
     <div className="product-form">
       <VariantSelector
@@ -231,7 +301,31 @@ function ProductForm({
       >
         {({option}) => <ProductOptions key={option.name} option={option} />}
       </VariantSelector>
-      <br />
+
+      <div className="product-quantity">
+        <label className="product-quantity-label">Quantity</label>
+        <div className="product-quantity-selector">
+          <button
+            type="button"
+            className="quantity-btn"
+            onClick={decreaseQuantity}
+            disabled={quantity <= 1}
+            aria-label="Decrease quantity"
+          >
+            −
+          </button>
+          <span className="quantity-value">{quantity}</span>
+          <button
+            type="button"
+            className="quantity-btn"
+            onClick={increaseQuantity}
+            aria-label="Increase quantity"
+          >
+            +
+          </button>
+        </div>
+      </div>
+
       <AddToCartButton
         disabled={!selectedVariant || !selectedVariant.availableForSale}
         onClick={() => {
@@ -242,7 +336,7 @@ function ProductForm({
             ? [
                 {
                   merchandiseId: selectedVariant.id,
-                  quantity: 1,
+                  quantity: quantity,
                 },
               ]
             : []
@@ -255,6 +349,60 @@ function ProductForm({
 }
 
 function ProductOptions({option}: {option: VariantOption}) {
+  const isColorOption = option.name.toLowerCase() === 'color';
+  const activeValue = option.values.find((v) => v.isActive)?.value;
+
+  // Color name to hex mapping
+  const colorMap: Record<string, string> = {
+    green: '#2d5a27',
+    olive: '#808000',
+    ocean: '#006994',
+    purple: '#663399',
+    red: '#8b3a3a',
+    black: '#000000',
+    white: '#ffffff',
+    blue: '#0066cc',
+    gray: '#808080',
+    grey: '#808080',
+    navy: '#000080',
+    pink: '#ffc0cb',
+    orange: '#ff8c00',
+    yellow: '#ffd700',
+    brown: '#8b4513',
+    beige: '#f5f5dc',
+  };
+
+  if (isColorOption) {
+    return (
+      <div className="product-options product-options-color" key={option.name}>
+        <label className="product-options-label">
+          {option.name} : {activeValue}
+        </label>
+        <div className="product-color-swatches">
+          {option.values.map(({value, isAvailable, isActive, to}) => {
+            const colorHex = colorMap[value.toLowerCase()] || '#cccccc';
+            return (
+              <Link
+                className={`product-color-swatch ${isActive ? 'active' : ''} ${!isAvailable ? 'unavailable' : ''}`}
+                key={option.name + value}
+                prefetch="intent"
+                preventScrollReset
+                replace
+                to={to}
+                title={value}
+              >
+                <span
+                  className="swatch-color"
+                  style={{backgroundColor: colorHex}}
+                />
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="product-options" key={option.name}>
       <label className="product-options-label">{option.name}</label>
