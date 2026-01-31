@@ -1,0 +1,7 @@
+{
+  "installCommand": "npm install --legacy-peer-deps",
+  "env": {
+    "SESSION_SECRET": "hydrogen-mock-shop-session-secret-2026",
+    "PUBLIC_STORE_DOMAIN": "mock.shop"
+  }
+}
