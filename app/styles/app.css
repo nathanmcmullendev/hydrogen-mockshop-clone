@@ -110,12 +110,20 @@ ul, ol {
 .header-menu-item {
   font-size: 14px;
   font-weight: var(--font-weight-medium);
-  color: var(--color-text);
+  color: var(--color-text) !important;
+  text-decoration: none !important;
   transition: opacity 0.2s;
 }
 
 .header-menu-item:hover {
   opacity: 0.6;
+}
+
+.header-menu-desktop a,
+.header-menu-desktop a:visited,
+.header-menu-desktop a:link {
+  color: var(--color-text) !important;
+  text-decoration: none !important;
 }
 
 .header-logo {
@@ -434,10 +442,16 @@ main {
 }
 
 .lifestyle-content h2 {
-  font-size: 24px;
-  font-weight: var(--font-weight-medium);
-  margin-bottom: 24px;
+  font-size: 28px;
+  font-weight: var(--font-weight-bold);
+  margin-bottom: 8px;
   max-width: 280px;
+}
+
+.lifestyle-content .lifestyle-text {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin-bottom: 24px;
 }
 
 .lifestyle-button {

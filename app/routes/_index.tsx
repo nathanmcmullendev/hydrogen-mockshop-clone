@@ -36,13 +36,13 @@ function HeroSection() {
   return (
     <section className="hero-section">
       <img
-        src="https://cdn.shopify.com/s/files/1/0688/1755/1382/files/banner-1.png?v=1675455659"
+        src="https://cdn.shopify.com/s/files/1/0688/1755/1382/files/Hero_3b621985-93ab-4f44-8b47-860e29b5027c.jpg?v=1675456354"
         alt="The Peak Collection"
       />
       <div className="hero-content">
         <h1>The Peak<br />Collection</h1>
         <p>Push your performance with our premium athletic wear</p>
-        <Link to="/collections/featured" className="hero-button">
+        <Link to="/collections" className="hero-button">
           Shop now
         </Link>
       </div>
@@ -91,19 +91,20 @@ function LifestyleSection() {
     <section className="lifestyle-section">
       <div className="lifestyle-image">
         <img
-          src="https://cdn.shopify.com/s/files/1/0688/1755/1382/files/banner-3.png?v=1675456899"
+          src="https://cdn.shopify.com/s/files/1/0688/1755/1382/files/Midweight_1.jpg?v=1675456899"
           alt="Lifestyle"
         />
       </div>
       <div className="lifestyle-content">
-        <h2>Clothes that work as hard as you do.</h2>
+        <h2>Midweight classics</h2>
+        <p className="lifestyle-text">Clothes that work as hard as you do.</p>
         <Link to="/collections" className="lifestyle-button">
           Shop now
         </Link>
       </div>
       <div className="lifestyle-image">
         <img
-          src="https://cdn.shopify.com/s/files/1/0688/1755/1382/files/banner-4.png?v=1675456929"
+          src="https://cdn.shopify.com/s/files/1/0688/1755/1382/files/Midweight_2.jpg?v=1675456929"
           alt="Lifestyle"
         />
       </div>
