@@ -1,6 +1,7 @@
 import {Await, NavLink, useMatches} from '@remix-run/react';
 import {Suspense} from 'react';
 import type {LayoutProps} from './Layout';
+import {WishlistIcon} from '~/components/Wishlist';
 
 type HeaderProps = Pick<LayoutProps, 'header' | 'cart' | 'isLoggedIn'>;
 
@@ -26,9 +27,10 @@ export function Header({header, isLoggedIn, cart}: HeaderProps) {
         </NavLink>
       </div>
 
-      {/* RIGHT: Search + Account + Cart */}
+      {/* RIGHT: Search + Wishlist + Account + Cart */}
       <div className="header-right">
         <SearchToggle />
+        <WishlistIcon />
         <NavLink prefetch="intent" to="/account" className="header-account-link">
           <AccountIcon />
         </NavLink>

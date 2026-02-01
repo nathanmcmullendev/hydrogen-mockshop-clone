@@ -14,6 +14,7 @@ import {
   type RouteContentData,
 } from '~/sections';
 import {ProductQuickView, QuickViewButton} from '~/components/ProductQuickView';
+import {WishlistButton} from '~/components/Wishlist';
 
 export const meta: V2_MetaFunction = () => {
   return [{title: 'Mock.shop | Home'}];
@@ -113,21 +114,32 @@ function NewArrivalsSection({
             <div className="new-arrivals-grid">
               {products.nodes.map((product) => (
                 <div key={product.id} className="new-arrivals-product">
-                  <Link
-                    className="new-arrivals-product-link"
-                    to={`/products/${product.handle}`}
-                  >
-                    <div className="new-arrivals-product-image">
+                  <div className="new-arrivals-product-image">
+                    <Link to={`/products/${product.handle}`}>
                       <Image
                         data={product.images.nodes[0]}
                         aspectRatio="1/1"
                         sizes="(min-width: 45em) 20vw, 50vw"
                       />
-                      <QuickViewButton
-                        productHandle={product.handle}
-                        onQuickView={onQuickView}
-                      />
-                    </div>
+                    </Link>
+                    <WishlistButton
+                      product={{
+                        id: product.id,
+                        handle: product.handle,
+                        title: product.title,
+                        price: product.priceRange.minVariantPrice,
+                        image: product.images.nodes[0],
+                      }}
+                    />
+                    <QuickViewButton
+                      productHandle={product.handle}
+                      onQuickView={onQuickView}
+                    />
+                  </div>
+                  <Link
+                    className="new-arrivals-product-info"
+                    to={`/products/${product.handle}`}
+                  >
                     <h4>{product.title}</h4>
                     <small>
                       <Money data={product.priceRange.minVariantPrice} />

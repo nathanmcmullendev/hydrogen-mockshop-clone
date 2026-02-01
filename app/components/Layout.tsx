@@ -13,6 +13,7 @@ import {
   PredictiveSearchForm,
   PredictiveSearchResults,
 } from '~/components/Search';
+import {WishlistProvider, WishlistDrawer} from '~/components/Wishlist';
 
 export type LayoutProps = {
   cart: Promise<CartApiQueryFragment | null>;
@@ -30,8 +31,9 @@ export function Layout({
   isLoggedIn,
 }: LayoutProps) {
   return (
-    <>
+    <WishlistProvider>
       <CartAside cart={cart} />
+      <WishlistAside />
       <SearchDropdown />
       <MobileMenuAside menu={header.menu} />
       <Header header={header} cart={cart} isLoggedIn={isLoggedIn} />
@@ -41,7 +43,15 @@ export function Layout({
           {(footer) => <Footer menu={footer.menu} />}
         </Await>
       </Suspense>
-    </>
+    </WishlistProvider>
+  );
+}
+
+function WishlistAside() {
+  return (
+    <Aside id="wishlist-aside" heading="WISHLIST">
+      <WishlistDrawer />
+    </Aside>
   );
 }
 
