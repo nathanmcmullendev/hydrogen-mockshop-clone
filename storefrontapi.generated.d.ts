@@ -1052,6 +1052,50 @@ export type PredictiveSearchQuery = {
   }>;
 };
 
+export type QuickViewProductQueryVariables = StorefrontAPI.Exact<{
+  handle: StorefrontAPI.Scalars['String'];
+  country?: StorefrontAPI.InputMaybe<StorefrontAPI.CountryCode>;
+  language?: StorefrontAPI.InputMaybe<StorefrontAPI.LanguageCode>;
+}>;
+
+export type QuickViewProductQuery = {
+  product?: StorefrontAPI.Maybe<
+    Pick<
+      StorefrontAPI.Product,
+      'id' | 'title' | 'handle' | 'descriptionHtml'
+    > & {
+      options: Array<Pick<StorefrontAPI.ProductOption, 'name' | 'values'>>;
+      priceRange: {
+        minVariantPrice: Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>;
+      };
+      images: {
+        nodes: Array<
+          Pick<StorefrontAPI.Image, 'url' | 'altText' | 'width' | 'height'>
+        >;
+      };
+      variants: {
+        nodes: Array<
+          Pick<
+            StorefrontAPI.ProductVariant,
+            'id' | 'title' | 'availableForSale'
+          > & {
+            price: Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>;
+            compareAtPrice?: StorefrontAPI.Maybe<
+              Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>
+            >;
+            image?: StorefrontAPI.Maybe<
+              Pick<StorefrontAPI.Image, 'url' | 'altText' | 'width' | 'height'>
+            >;
+            selectedOptions: Array<
+              Pick<StorefrontAPI.SelectedOption, 'name' | 'value'>
+            >;
+          }
+        >;
+      };
+    }
+  >;
+};
+
 export type ArticleQueryVariables = StorefrontAPI.Exact<{
   articleHandle: StorefrontAPI.Scalars['String'];
   blogHandle: StorefrontAPI.Scalars['String'];
@@ -1227,7 +1271,7 @@ export type CollectionQuery = {
         >;
         pageInfo: Pick<
           StorefrontAPI.PageInfo,
-          'hasPreviousPage' | 'hasNextPage' | 'endCursor'
+          'hasPreviousPage' | 'hasNextPage' | 'startCursor' | 'endCursor'
         >;
       };
     }
@@ -1664,6 +1708,1072 @@ export type SearchQuery = {
   };
 };
 
+export type RouteContentQueryVariables = StorefrontAPI.Exact<{
+  handle: StorefrontAPI.Scalars['String'];
+  country?: StorefrontAPI.InputMaybe<StorefrontAPI.CountryCode>;
+  language?: StorefrontAPI.InputMaybe<StorefrontAPI.LanguageCode>;
+}>;
+
+export type RouteContentQuery = {
+  route?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.Metaobject, 'type' | 'id'> & {
+      title?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+      >;
+      sections?: StorefrontAPI.Maybe<{
+        references?: StorefrontAPI.Maybe<{
+          nodes: Array<
+            Pick<StorefrontAPI.Metaobject, 'id' | 'type'> & {
+              heading?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+              >;
+              subheading?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+              >;
+              button_text?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+              >;
+              button_link?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+              >;
+              image?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'key'> & {
+                  reference?: StorefrontAPI.Maybe<{
+                    image?: StorefrontAPI.Maybe<
+                      Pick<
+                        StorefrontAPI.Image,
+                        'altText' | 'url' | 'width' | 'height'
+                      >
+                    >;
+                  }>;
+                }
+              >;
+              autoplay?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+              >;
+              autoplay_speed?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+              >;
+              slides?: StorefrontAPI.Maybe<{
+                references?: StorefrontAPI.Maybe<{
+                  nodes: Array<
+                    Pick<StorefrontAPI.Metaobject, 'id'> & {
+                      heading?: StorefrontAPI.Maybe<
+                        Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+                      >;
+                      subheading?: StorefrontAPI.Maybe<
+                        Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+                      >;
+                      button_text?: StorefrontAPI.Maybe<
+                        Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+                      >;
+                      button_link?: StorefrontAPI.Maybe<
+                        Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+                      >;
+                      image?: StorefrontAPI.Maybe<{
+                        reference?: StorefrontAPI.Maybe<{
+                          image?: StorefrontAPI.Maybe<
+                            Pick<StorefrontAPI.Image, 'url' | 'altText'>
+                          >;
+                        }>;
+                      }>;
+                    }
+                  >;
+                }>;
+              }>;
+              label?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+              >;
+              show_prices?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+              >;
+              products?: StorefrontAPI.Maybe<{
+                references?: StorefrontAPI.Maybe<{
+                  nodes: Array<
+                    Pick<StorefrontAPI.Product, 'id' | 'title' | 'handle'> & {
+                      variants: {
+                        nodes: Array<{
+                          image?: StorefrontAPI.Maybe<
+                            Pick<
+                              StorefrontAPI.Image,
+                              'altText' | 'width' | 'height' | 'url'
+                            >
+                          >;
+                        }>;
+                      };
+                      priceRange: {
+                        minVariantPrice: Pick<
+                          StorefrontAPI.MoneyV2,
+                          'amount' | 'currencyCode'
+                        >;
+                      };
+                    }
+                  >;
+                }>;
+              }>;
+              columns?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+              >;
+              collections?: StorefrontAPI.Maybe<{
+                references?: StorefrontAPI.Maybe<{
+                  nodes: Array<
+                    Pick<
+                      StorefrontAPI.Collection,
+                      'id' | 'title' | 'handle' | 'description'
+                    > & {
+                      image?: StorefrontAPI.Maybe<
+                        Pick<
+                          StorefrontAPI.Image,
+                          'url' | 'altText' | 'width' | 'height'
+                        >
+                      >;
+                    }
+                  >;
+                }>;
+              }>;
+              content?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+              >;
+              link_text?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+              >;
+              link_url?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+              >;
+              body?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+              >;
+              image_position?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+              >;
+              video_url?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+              >;
+              video_file?: StorefrontAPI.Maybe<{
+                reference?: StorefrontAPI.Maybe<{
+                  sources: Array<
+                    Pick<StorefrontAPI.VideoSource, 'url' | 'mimeType'>
+                  >;
+                }>;
+              }>;
+              poster_image?: StorefrontAPI.Maybe<{
+                reference?: StorefrontAPI.Maybe<{
+                  image?: StorefrontAPI.Maybe<
+                    Pick<StorefrontAPI.Image, 'url' | 'altText'>
+                  >;
+                }>;
+              }>;
+              loop?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+              >;
+              muted?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+              >;
+              testimonials?: StorefrontAPI.Maybe<{
+                references?: StorefrontAPI.Maybe<{
+                  nodes: Array<
+                    Pick<StorefrontAPI.Metaobject, 'id'> & {
+                      quote?: StorefrontAPI.Maybe<
+                        Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+                      >;
+                      author?: StorefrontAPI.Maybe<
+                        Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+                      >;
+                      role?: StorefrontAPI.Maybe<
+                        Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+                      >;
+                      rating?: StorefrontAPI.Maybe<
+                        Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+                      >;
+                      avatar?: StorefrontAPI.Maybe<{
+                        reference?: StorefrontAPI.Maybe<{
+                          image?: StorefrontAPI.Maybe<
+                            Pick<StorefrontAPI.Image, 'url' | 'altText'>
+                          >;
+                        }>;
+                      }>;
+                    }
+                  >;
+                }>;
+              }>;
+              grayscale?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+              >;
+              logos?: StorefrontAPI.Maybe<{
+                references?: StorefrontAPI.Maybe<{
+                  nodes: Array<{
+                    image?: StorefrontAPI.Maybe<
+                      Pick<StorefrontAPI.Image, 'url' | 'altText'>
+                    >;
+                  }>;
+                }>;
+              }>;
+              faqs?: StorefrontAPI.Maybe<{
+                references?: StorefrontAPI.Maybe<{
+                  nodes: Array<
+                    Pick<StorefrontAPI.Metaobject, 'id'> & {
+                      question?: StorefrontAPI.Maybe<
+                        Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+                      >;
+                      answer?: StorefrontAPI.Maybe<
+                        Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+                      >;
+                    }
+                  >;
+                }>;
+              }>;
+              features?: StorefrontAPI.Maybe<{
+                references?: StorefrontAPI.Maybe<{
+                  nodes: Array<
+                    Pick<StorefrontAPI.Metaobject, 'id'> & {
+                      title?: StorefrontAPI.Maybe<
+                        Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+                      >;
+                      description?: StorefrontAPI.Maybe<
+                        Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+                      >;
+                      icon?: StorefrontAPI.Maybe<
+                        Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+                      >;
+                      icon_image?: StorefrontAPI.Maybe<{
+                        reference?: StorefrontAPI.Maybe<{
+                          image?: StorefrontAPI.Maybe<
+                            Pick<StorefrontAPI.Image, 'url' | 'altText'>
+                          >;
+                        }>;
+                      }>;
+                    }
+                  >;
+                }>;
+              }>;
+              text?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+              >;
+              background_color?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+              >;
+              text_color?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+              >;
+              end_date?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+              >;
+              expired_text?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+              >;
+              placeholder?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+              >;
+              social_text?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+              >;
+              twitter_url?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+              >;
+              instagram_url?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+              >;
+              facebook_url?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+              >;
+              youtube_url?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+              >;
+              pinterest_url?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+              >;
+              tiktok_url?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+              >;
+            }
+          >;
+        }>;
+      }>;
+    }
+  >;
+};
+
+export type SectionBannerFragment = Pick<
+  StorefrontAPI.Metaobject,
+  'type' | 'id'
+> & {
+  text?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  link_text?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  link_url?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  background_color?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  text_color?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+};
+
+export type SectionCollectionGridFragment = Pick<
+  StorefrontAPI.Metaobject,
+  'type' | 'id'
+> & {
+  heading?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  subheading?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  columns?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+  >;
+  collections?: StorefrontAPI.Maybe<{
+    references?: StorefrontAPI.Maybe<{
+      nodes: Array<
+        Pick<
+          StorefrontAPI.Collection,
+          'id' | 'title' | 'handle' | 'description'
+        > & {
+          image?: StorefrontAPI.Maybe<
+            Pick<StorefrontAPI.Image, 'url' | 'altText' | 'width' | 'height'>
+          >;
+        }
+      >;
+    }>;
+  }>;
+};
+
+export type SectionCountdownFragment = Pick<
+  StorefrontAPI.Metaobject,
+  'type' | 'id'
+> & {
+  heading?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  subheading?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  end_date?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+  >;
+  expired_text?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  button_text?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  button_link?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  background_color?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  text_color?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+};
+
+export type FaqItemFragment = Pick<StorefrontAPI.Metaobject, 'id'> & {
+  question?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+  >;
+  answer?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+  >;
+};
+
+export type SectionFaqFragment = Pick<
+  StorefrontAPI.Metaobject,
+  'type' | 'id'
+> & {
+  heading?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  subheading?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  faqs?: StorefrontAPI.Maybe<{
+    references?: StorefrontAPI.Maybe<{
+      nodes: Array<
+        Pick<StorefrontAPI.Metaobject, 'id'> & {
+          question?: StorefrontAPI.Maybe<
+            Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+          >;
+          answer?: StorefrontAPI.Maybe<
+            Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+          >;
+        }
+      >;
+    }>;
+  }>;
+};
+
+export type SectionFeaturedProductFragment = Pick<
+  StorefrontAPI.Product,
+  'id' | 'title' | 'handle'
+> & {
+  variants: {
+    nodes: Array<{
+      image?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.Image, 'altText' | 'width' | 'height' | 'url'>
+      >;
+    }>;
+  };
+  priceRange: {
+    minVariantPrice: Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>;
+  };
+};
+
+export type SectionFeaturedProductsFragment = Pick<
+  StorefrontAPI.Metaobject,
+  'type' | 'id'
+> & {
+  label?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  heading?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  show_prices?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  products?: StorefrontAPI.Maybe<{
+    references?: StorefrontAPI.Maybe<{
+      nodes: Array<
+        Pick<StorefrontAPI.Product, 'id' | 'title' | 'handle'> & {
+          variants: {
+            nodes: Array<{
+              image?: StorefrontAPI.Maybe<
+                Pick<
+                  StorefrontAPI.Image,
+                  'altText' | 'width' | 'height' | 'url'
+                >
+              >;
+            }>;
+          };
+          priceRange: {
+            minVariantPrice: Pick<
+              StorefrontAPI.MoneyV2,
+              'amount' | 'currencyCode'
+            >;
+          };
+        }
+      >;
+    }>;
+  }>;
+};
+
+export type FeatureItemFragment = Pick<StorefrontAPI.Metaobject, 'id'> & {
+  title?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+  >;
+  description?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+  >;
+  icon?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+  >;
+  icon_image?: StorefrontAPI.Maybe<{
+    reference?: StorefrontAPI.Maybe<{
+      image?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Image, 'url' | 'altText'>>;
+    }>;
+  }>;
+};
+
+export type SectionFeaturesFragment = Pick<
+  StorefrontAPI.Metaobject,
+  'type' | 'id'
+> & {
+  heading?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  subheading?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  columns?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+  >;
+  features?: StorefrontAPI.Maybe<{
+    references?: StorefrontAPI.Maybe<{
+      nodes: Array<
+        Pick<StorefrontAPI.Metaobject, 'id'> & {
+          title?: StorefrontAPI.Maybe<
+            Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+          >;
+          description?: StorefrontAPI.Maybe<
+            Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+          >;
+          icon?: StorefrontAPI.Maybe<
+            Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+          >;
+          icon_image?: StorefrontAPI.Maybe<{
+            reference?: StorefrontAPI.Maybe<{
+              image?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.Image, 'url' | 'altText'>
+              >;
+            }>;
+          }>;
+        }
+      >;
+    }>;
+  }>;
+};
+
+export type SectionHeroMediaImageFragment = {
+  image?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.Image, 'altText' | 'url' | 'width' | 'height'>
+  >;
+};
+
+export type SectionHeroFragment = Pick<
+  StorefrontAPI.Metaobject,
+  'type' | 'id'
+> & {
+  heading?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  subheading?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  button_text?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  button_link?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  image?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key'> & {
+      reference?: StorefrontAPI.Maybe<{
+        image?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.Image, 'altText' | 'url' | 'width' | 'height'>
+        >;
+      }>;
+    }
+  >;
+};
+
+export type HeroSlideFragment = Pick<StorefrontAPI.Metaobject, 'id'> & {
+  heading?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+  >;
+  subheading?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+  >;
+  button_text?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+  >;
+  button_link?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+  >;
+  image?: StorefrontAPI.Maybe<{
+    reference?: StorefrontAPI.Maybe<{
+      image?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Image, 'url' | 'altText'>>;
+    }>;
+  }>;
+};
+
+export type SectionHeroSliderFragment = Pick<
+  StorefrontAPI.Metaobject,
+  'type' | 'id'
+> & {
+  autoplay?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+  >;
+  autoplay_speed?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+  >;
+  slides?: StorefrontAPI.Maybe<{
+    references?: StorefrontAPI.Maybe<{
+      nodes: Array<
+        Pick<StorefrontAPI.Metaobject, 'id'> & {
+          heading?: StorefrontAPI.Maybe<
+            Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+          >;
+          subheading?: StorefrontAPI.Maybe<
+            Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+          >;
+          button_text?: StorefrontAPI.Maybe<
+            Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+          >;
+          button_link?: StorefrontAPI.Maybe<
+            Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+          >;
+          image?: StorefrontAPI.Maybe<{
+            reference?: StorefrontAPI.Maybe<{
+              image?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.Image, 'url' | 'altText'>
+              >;
+            }>;
+          }>;
+        }
+      >;
+    }>;
+  }>;
+};
+
+export type SectionImageWithTextMediaImageFragment = {
+  image?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.Image, 'altText' | 'url' | 'width' | 'height'>
+  >;
+};
+
+export type SectionImageWithTextFragment = Pick<
+  StorefrontAPI.Metaobject,
+  'type' | 'id'
+> & {
+  heading?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  body?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  button_text?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  button_link?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  image_position?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  image?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key'> & {
+      reference?: StorefrontAPI.Maybe<{
+        image?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.Image, 'altText' | 'url' | 'width' | 'height'>
+        >;
+      }>;
+    }
+  >;
+};
+
+export type SectionLogosFragment = Pick<
+  StorefrontAPI.Metaobject,
+  'type' | 'id'
+> & {
+  heading?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  grayscale?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+  >;
+  logos?: StorefrontAPI.Maybe<{
+    references?: StorefrontAPI.Maybe<{
+      nodes: Array<{
+        image?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.Image, 'url' | 'altText'>
+        >;
+      }>;
+    }>;
+  }>;
+};
+
+export type SectionNewsletterFragment = Pick<
+  StorefrontAPI.Metaobject,
+  'type' | 'id'
+> & {
+  heading?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  placeholder?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  social_text?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  twitter_url?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+  >;
+  instagram_url?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+  >;
+  facebook_url?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+  >;
+  youtube_url?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+  >;
+  pinterest_url?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+  >;
+  tiktok_url?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+  >;
+};
+
+export type SectionRichTextFragment = Pick<
+  StorefrontAPI.Metaobject,
+  'type' | 'id'
+> & {
+  content?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  link_text?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  link_url?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+};
+
+export type TestimonialFragment = Pick<StorefrontAPI.Metaobject, 'id'> & {
+  quote?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+  >;
+  author?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+  >;
+  role?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+  >;
+  rating?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+  >;
+  avatar?: StorefrontAPI.Maybe<{
+    reference?: StorefrontAPI.Maybe<{
+      image?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Image, 'url' | 'altText'>>;
+    }>;
+  }>;
+};
+
+export type SectionTestimonialsFragment = Pick<
+  StorefrontAPI.Metaobject,
+  'type' | 'id'
+> & {
+  heading?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  testimonials?: StorefrontAPI.Maybe<{
+    references?: StorefrontAPI.Maybe<{
+      nodes: Array<
+        Pick<StorefrontAPI.Metaobject, 'id'> & {
+          quote?: StorefrontAPI.Maybe<
+            Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+          >;
+          author?: StorefrontAPI.Maybe<
+            Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+          >;
+          role?: StorefrontAPI.Maybe<
+            Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+          >;
+          rating?: StorefrontAPI.Maybe<
+            Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+          >;
+          avatar?: StorefrontAPI.Maybe<{
+            reference?: StorefrontAPI.Maybe<{
+              image?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.Image, 'url' | 'altText'>
+              >;
+            }>;
+          }>;
+        }
+      >;
+    }>;
+  }>;
+};
+
+export type SectionVideoFragment = Pick<
+  StorefrontAPI.Metaobject,
+  'type' | 'id'
+> & {
+  heading?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  subheading?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  video_url?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+  >;
+  video_file?: StorefrontAPI.Maybe<{
+    reference?: StorefrontAPI.Maybe<{
+      sources: Array<Pick<StorefrontAPI.VideoSource, 'url' | 'mimeType'>>;
+    }>;
+  }>;
+  poster_image?: StorefrontAPI.Maybe<{
+    reference?: StorefrontAPI.Maybe<{
+      image?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Image, 'url' | 'altText'>>;
+    }>;
+  }>;
+  autoplay?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+  >;
+  loop?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+  >;
+  muted?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+  >;
+};
+
+export type SectionsFragment = {
+  references?: StorefrontAPI.Maybe<{
+    nodes: Array<
+      Pick<StorefrontAPI.Metaobject, 'id' | 'type'> & {
+        heading?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+        >;
+        subheading?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+        >;
+        button_text?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+        >;
+        button_link?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+        >;
+        image?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.MetaobjectField, 'key'> & {
+            reference?: StorefrontAPI.Maybe<{
+              image?: StorefrontAPI.Maybe<
+                Pick<
+                  StorefrontAPI.Image,
+                  'altText' | 'url' | 'width' | 'height'
+                >
+              >;
+            }>;
+          }
+        >;
+        autoplay?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+        >;
+        autoplay_speed?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+        >;
+        slides?: StorefrontAPI.Maybe<{
+          references?: StorefrontAPI.Maybe<{
+            nodes: Array<
+              Pick<StorefrontAPI.Metaobject, 'id'> & {
+                heading?: StorefrontAPI.Maybe<
+                  Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+                >;
+                subheading?: StorefrontAPI.Maybe<
+                  Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+                >;
+                button_text?: StorefrontAPI.Maybe<
+                  Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+                >;
+                button_link?: StorefrontAPI.Maybe<
+                  Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+                >;
+                image?: StorefrontAPI.Maybe<{
+                  reference?: StorefrontAPI.Maybe<{
+                    image?: StorefrontAPI.Maybe<
+                      Pick<StorefrontAPI.Image, 'url' | 'altText'>
+                    >;
+                  }>;
+                }>;
+              }
+            >;
+          }>;
+        }>;
+        label?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+        >;
+        show_prices?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+        >;
+        products?: StorefrontAPI.Maybe<{
+          references?: StorefrontAPI.Maybe<{
+            nodes: Array<
+              Pick<StorefrontAPI.Product, 'id' | 'title' | 'handle'> & {
+                variants: {
+                  nodes: Array<{
+                    image?: StorefrontAPI.Maybe<
+                      Pick<
+                        StorefrontAPI.Image,
+                        'altText' | 'width' | 'height' | 'url'
+                      >
+                    >;
+                  }>;
+                };
+                priceRange: {
+                  minVariantPrice: Pick<
+                    StorefrontAPI.MoneyV2,
+                    'amount' | 'currencyCode'
+                  >;
+                };
+              }
+            >;
+          }>;
+        }>;
+        columns?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+        >;
+        collections?: StorefrontAPI.Maybe<{
+          references?: StorefrontAPI.Maybe<{
+            nodes: Array<
+              Pick<
+                StorefrontAPI.Collection,
+                'id' | 'title' | 'handle' | 'description'
+              > & {
+                image?: StorefrontAPI.Maybe<
+                  Pick<
+                    StorefrontAPI.Image,
+                    'url' | 'altText' | 'width' | 'height'
+                  >
+                >;
+              }
+            >;
+          }>;
+        }>;
+        content?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+        >;
+        link_text?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+        >;
+        link_url?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+        >;
+        body?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+        >;
+        image_position?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+        >;
+        video_url?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+        >;
+        video_file?: StorefrontAPI.Maybe<{
+          reference?: StorefrontAPI.Maybe<{
+            sources: Array<Pick<StorefrontAPI.VideoSource, 'url' | 'mimeType'>>;
+          }>;
+        }>;
+        poster_image?: StorefrontAPI.Maybe<{
+          reference?: StorefrontAPI.Maybe<{
+            image?: StorefrontAPI.Maybe<
+              Pick<StorefrontAPI.Image, 'url' | 'altText'>
+            >;
+          }>;
+        }>;
+        loop?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+        >;
+        muted?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+        >;
+        testimonials?: StorefrontAPI.Maybe<{
+          references?: StorefrontAPI.Maybe<{
+            nodes: Array<
+              Pick<StorefrontAPI.Metaobject, 'id'> & {
+                quote?: StorefrontAPI.Maybe<
+                  Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+                >;
+                author?: StorefrontAPI.Maybe<
+                  Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+                >;
+                role?: StorefrontAPI.Maybe<
+                  Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+                >;
+                rating?: StorefrontAPI.Maybe<
+                  Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+                >;
+                avatar?: StorefrontAPI.Maybe<{
+                  reference?: StorefrontAPI.Maybe<{
+                    image?: StorefrontAPI.Maybe<
+                      Pick<StorefrontAPI.Image, 'url' | 'altText'>
+                    >;
+                  }>;
+                }>;
+              }
+            >;
+          }>;
+        }>;
+        grayscale?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+        >;
+        logos?: StorefrontAPI.Maybe<{
+          references?: StorefrontAPI.Maybe<{
+            nodes: Array<{
+              image?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.Image, 'url' | 'altText'>
+              >;
+            }>;
+          }>;
+        }>;
+        faqs?: StorefrontAPI.Maybe<{
+          references?: StorefrontAPI.Maybe<{
+            nodes: Array<
+              Pick<StorefrontAPI.Metaobject, 'id'> & {
+                question?: StorefrontAPI.Maybe<
+                  Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+                >;
+                answer?: StorefrontAPI.Maybe<
+                  Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+                >;
+              }
+            >;
+          }>;
+        }>;
+        features?: StorefrontAPI.Maybe<{
+          references?: StorefrontAPI.Maybe<{
+            nodes: Array<
+              Pick<StorefrontAPI.Metaobject, 'id'> & {
+                title?: StorefrontAPI.Maybe<
+                  Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+                >;
+                description?: StorefrontAPI.Maybe<
+                  Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+                >;
+                icon?: StorefrontAPI.Maybe<
+                  Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+                >;
+                icon_image?: StorefrontAPI.Maybe<{
+                  reference?: StorefrontAPI.Maybe<{
+                    image?: StorefrontAPI.Maybe<
+                      Pick<StorefrontAPI.Image, 'url' | 'altText'>
+                    >;
+                  }>;
+                }>;
+              }
+            >;
+          }>;
+        }>;
+        text?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+        >;
+        background_color?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+        >;
+        text_color?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+        >;
+        end_date?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+        >;
+        expired_text?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+        >;
+        placeholder?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+        >;
+        social_text?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.MetaobjectField, 'key' | 'value' | 'type'>
+        >;
+        twitter_url?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+        >;
+        instagram_url?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+        >;
+        facebook_url?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+        >;
+        youtube_url?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+        >;
+        pinterest_url?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+        >;
+        tiktok_url?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>
+        >;
+      }
+    >;
+  }>;
+};
+
 export type MoneyFragment = Pick<
   StorefrontAPI.MoneyV2,
   'currencyCode' | 'amount'
@@ -1787,7 +2897,7 @@ interface GeneratedQueryTypes {
     return: FeaturedCollectionQuery;
     variables: FeaturedCollectionQueryVariables;
   };
-  '#graphql\n  fragment RecommendedProduct on Product {\n    id\n    title\n    handle\n    priceRange {\n      minVariantPrice {\n        amount\n        currencyCode\n      }\n    }\n    images(first: 1) {\n      nodes {\n        id\n        url\n        altText\n        width\n        height\n      }\n    }\n  }\n  query RecommendedProducts ($country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    products(first: 4, sortKey: UPDATED_AT, reverse: true) {\n      nodes {\n        ...RecommendedProduct\n      }\n    }\n  }\n': {
+  '#graphql\n  fragment RecommendedProduct on Product {\n    id\n    title\n    handle\n    priceRange {\n      minVariantPrice {\n        amount\n        currencyCode\n      }\n    }\n    images(first: 1) {\n      nodes {\n        id\n        url\n        altText\n        width\n        height\n      }\n    }\n  }\n  query RecommendedProducts ($country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    products(first: 6, sortKey: UPDATED_AT, reverse: true) {\n      nodes {\n        ...RecommendedProduct\n      }\n    }\n  }\n': {
     return: RecommendedProductsQuery;
     variables: RecommendedProductsQueryVariables;
   };
@@ -1807,6 +2917,10 @@ interface GeneratedQueryTypes {
     return: PredictiveSearchQuery;
     variables: PredictiveSearchQueryVariables;
   };
+  '#graphql\n  query QuickViewProduct(\n    $handle: String!\n    $country: CountryCode\n    $language: LanguageCode\n  ) @inContext(country: $country, language: $language) {\n    product(handle: $handle) {\n      id\n      title\n      handle\n      descriptionHtml\n      options {\n        name\n        values\n      }\n      priceRange {\n        minVariantPrice {\n          amount\n          currencyCode\n        }\n      }\n      images(first: 5) {\n        nodes {\n          url\n          altText\n          width\n          height\n        }\n      }\n      variants(first: 50) {\n        nodes {\n          id\n          title\n          availableForSale\n          price {\n            amount\n            currencyCode\n          }\n          compareAtPrice {\n            amount\n            currencyCode\n          }\n          image {\n            url\n            altText\n            width\n            height\n          }\n          selectedOptions {\n            name\n            value\n          }\n        }\n      }\n    }\n  }\n': {
+    return: QuickViewProductQuery;
+    variables: QuickViewProductQueryVariables;
+  };
   '#graphql\n  query Article(\n    $articleHandle: String!\n    $blogHandle: String!\n    $country: CountryCode\n    $language: LanguageCode\n  ) @inContext(language: $language, country: $country) {\n    blog(handle: $blogHandle) {\n      articleByHandle(handle: $articleHandle) {\n        title\n        contentHtml\n        publishedAt\n        author: authorV2 {\n          name\n        }\n        image {\n          id\n          altText\n          url\n          width\n          height\n        }\n        seo {\n          description\n          title\n        }\n      }\n    }\n  }\n': {
     return: ArticleQuery;
     variables: ArticleQueryVariables;
@@ -1819,7 +2933,7 @@ interface GeneratedQueryTypes {
     return: BlogsQuery;
     variables: BlogsQueryVariables;
   };
-  '#graphql\n  #graphql\n  fragment MoneyProductItem on MoneyV2 {\n    amount\n    currencyCode\n  }\n  fragment ProductItem on Product {\n    id\n    handle\n    title\n    featuredImage {\n      id\n      altText\n      url\n      width\n      height\n    }\n    priceRange {\n      minVariantPrice {\n        ...MoneyProductItem\n      }\n      maxVariantPrice {\n        ...MoneyProductItem\n      }\n    }\n    variants(first: 1) {\n      nodes {\n        selectedOptions {\n          name\n          value\n        }\n      }\n    }\n  }\n\n  query Collection(\n    $handle: String!\n    $country: CountryCode\n    $language: LanguageCode\n    $first: Int\n    $last: Int\n    $startCursor: String\n    $endCursor: String\n  ) @inContext(country: $country, language: $language) {\n    collection(handle: $handle) {\n      id\n      handle\n      title\n      description\n      products(\n        first: $first,\n        last: $last,\n        before: $startCursor,\n        after: $endCursor\n      ) {\n        nodes {\n          ...ProductItem\n        }\n        pageInfo {\n          hasPreviousPage\n          hasNextPage\n          hasNextPage\n          endCursor\n        }\n      }\n    }\n  }\n': {
+  '#graphql\n  #graphql\n  fragment MoneyProductItem on MoneyV2 {\n    amount\n    currencyCode\n  }\n  fragment ProductItem on Product {\n    id\n    handle\n    title\n    featuredImage {\n      id\n      altText\n      url\n      width\n      height\n    }\n    priceRange {\n      minVariantPrice {\n        ...MoneyProductItem\n      }\n      maxVariantPrice {\n        ...MoneyProductItem\n      }\n    }\n    variants(first: 1) {\n      nodes {\n        selectedOptions {\n          name\n          value\n        }\n      }\n    }\n  }\n\n  query Collection(\n    $handle: String!\n    $country: CountryCode\n    $language: LanguageCode\n    $first: Int\n    $last: Int\n    $startCursor: String\n    $endCursor: String\n  ) @inContext(country: $country, language: $language) {\n    collection(handle: $handle) {\n      id\n      handle\n      title\n      description\n      products(\n        first: $first,\n        last: $last,\n        before: $startCursor,\n        after: $endCursor\n      ) {\n        nodes {\n          ...ProductItem\n        }\n        pageInfo {\n          hasPreviousPage\n          hasNextPage\n          startCursor\n          endCursor\n        }\n      }\n    }\n  }\n': {
     return: CollectionQuery;
     variables: CollectionQueryVariables;
   };
@@ -1850,6 +2964,10 @@ interface GeneratedQueryTypes {
   '#graphql\n  fragment SearchProduct on Product {\n    __typename\n    handle\n    id\n    publishedAt\n    title\n    trackingParameters\n    vendor\n    variants(first: 1) {\n      nodes {\n        id\n        image {\n          url\n          altText\n          width\n          height\n        }\n        price {\n          amount\n          currencyCode\n        }\n        compareAtPrice {\n          amount\n          currencyCode\n        }\n        selectedOptions {\n          name\n          value\n        }\n        product {\n          handle\n          title\n        }\n      }\n    }\n  }\n  fragment SearchPage on Page {\n     __typename\n     handle\n    id\n    title\n    trackingParameters\n  }\n  fragment SearchArticle on Article {\n    __typename\n    handle\n    id\n    title\n    trackingParameters\n  }\n  query search(\n    $country: CountryCode\n    $endCursor: String\n    $first: Int\n    $language: LanguageCode\n    $last: Int\n    $query: String!\n    $startCursor: String\n  ) @inContext(country: $country, language: $language) {\n    products: search(\n      query: $query,\n      unavailableProducts: HIDE,\n      types: [PRODUCT],\n      first: $first,\n      sortKey: RELEVANCE,\n      last: $last,\n      before: $startCursor,\n      after: $endCursor\n    ) {\n      nodes {\n        ...on Product {\n          ...SearchProduct\n        }\n      }\n      pageInfo {\n        hasNextPage\n        hasPreviousPage\n        startCursor\n        endCursor\n      }\n    }\n    pages: search(\n      query: $query,\n      types: [PAGE],\n      first: 10\n    ) {\n      nodes {\n        ...on Page {\n          ...SearchPage\n        }\n      }\n    }\n    articles: search(\n      query: $query,\n      types: [ARTICLE],\n      first: 10\n    ) {\n      nodes {\n        ...on Article {\n          ...SearchArticle\n        }\n      }\n    }\n  }\n': {
     return: SearchQuery;
     variables: SearchQueryVariables;
+  };
+  '#graphql\n  query RouteContent($handle: String!, $country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    route: metaobject(handle: {type: "route", handle: $handle}) {\n      type\n      id\n      title: field(key: "title") {\n        key\n        value\n      }\n      sections: field(key: "sections") {\n        ...Sections\n      }\n    }\n  }\n  #graphql\n  fragment Sections on MetaobjectField {\n    references(first: 20) {\n      nodes {\n        ... on Metaobject {\n          id\n          type\n          # Hero sections\n          ...SectionHero\n          ...SectionHeroSlider\n          # Product/Collection sections\n          ...SectionFeaturedProducts\n          ...SectionCollectionGrid\n          # Content sections\n          ...SectionRichText\n          ...SectionImageWithText\n          ...SectionVideo\n          # Social proof sections\n          ...SectionTestimonials\n          ...SectionLogos\n          # Utility sections\n          ...SectionFAQ\n          ...SectionFeatures\n          ...SectionBanner\n          ...SectionCountdown\n          ...SectionNewsletter\n        }\n      }\n    }\n  }\n  #graphql\n  fragment SectionHero on Metaobject {\n    type\n    id\n    heading: field(key: "heading") {\n      key\n      value\n      type\n    }\n    subheading: field(key: "subheading") {\n      key\n      value\n      type\n    }\n    button_text: field(key: "button_text") {\n      key\n      value\n      type\n    }\n    button_link: field(key: "button_link") {\n      key\n      value\n      type\n    }\n    image: field(key: "image") {\n      key\n      reference {\n        ... on MediaImage {\n          ...SectionHeroMediaImage\n        }\n      }\n    }\n  }\n  #graphql\n  fragment SectionImageWithTextMediaImage on MediaImage {\n    image {\n      altText\n      url\n      width\n      height\n    }\n  }\n\n\n  #graphql\n  fragment SectionHeroSlider on Metaobject {\n    type\n    id\n    autoplay: field(key: "autoplay") {\n      key\n      value\n    }\n    autoplay_speed: field(key: "autoplay_speed") {\n      key\n      value\n    }\n    slides: field(key: "slides") {\n      references(first: 10) {\n        nodes {\n          ... on Metaobject {\n            ...HeroSlide\n          }\n        }\n      }\n    }\n  }\n  #graphql\n  fragment HeroSlide on Metaobject {\n    id\n    heading: field(key: "heading") {\n      key\n      value\n    }\n    subheading: field(key: "subheading") {\n      key\n      value\n    }\n    button_text: field(key: "button_text") {\n      key\n      value\n    }\n    button_link: field(key: "button_link") {\n      key\n      value\n    }\n    image: field(key: "image") {\n      reference {\n        ... on MediaImage {\n          image {\n            url\n            altText\n          }\n        }\n      }\n    }\n  }\n\n\n  #graphql\n  fragment SectionFeaturedProducts on Metaobject {\n    type\n    id\n    label: field(key: "label") {\n      key\n      value\n      type\n    }\n    heading: field(key: "heading") {\n      key\n      value\n      type\n    }\n    show_prices: field(key: "show_prices") {\n      key\n      value\n      type\n    }\n    products: field(key: "products") {\n      references(first: 12) {\n        nodes {\n          ... on Product {\n            ...SectionFeaturedProduct\n          }\n        }\n      }\n    }\n  }\n  #graphql\n  fragment SectionFeaturedProduct on Product {\n    id\n    title\n    handle\n    variants(first: 1) {\n      nodes {\n        image {\n          altText\n          width\n          height\n          url\n        }\n      }\n    }\n    priceRange {\n      minVariantPrice {\n        amount\n        currencyCode\n      }\n    }\n  }\n\n\n  #graphql\n  fragment SectionCollectionGrid on Metaobject {\n    type\n    id\n    heading: field(key: "heading") {\n      key\n      value\n      type\n    }\n    subheading: field(key: "subheading") {\n      key\n      value\n      type\n    }\n    columns: field(key: "columns") {\n      key\n      value\n    }\n    collections: field(key: "collections") {\n      references(first: 12) {\n        nodes {\n          ... on Collection {\n            id\n            title\n            handle\n            description\n            image {\n              url\n              altText\n              width\n              height\n            }\n          }\n        }\n      }\n    }\n  }\n\n  #graphql\n  fragment SectionRichText on Metaobject {\n    type\n    id\n    content: field(key: "content") {\n      key\n      value\n      type\n    }\n    link_text: field(key: "link_text") {\n      key\n      value\n      type\n    }\n    link_url: field(key: "link_url") {\n      key\n      value\n      type\n    }\n  }\n\n  #graphql\n  fragment SectionImageWithText on Metaobject {\n    type\n    id\n    heading: field(key: "heading") {\n      key\n      value\n      type\n    }\n    body: field(key: "body") {\n      key\n      value\n      type\n    }\n    button_text: field(key: "button_text") {\n      key\n      value\n      type\n    }\n    button_link: field(key: "button_link") {\n      key\n      value\n      type\n    }\n    image_position: field(key: "image_position") {\n      key\n      value\n      type\n    }\n    image: field(key: "image") {\n      key\n      reference {\n        ... on MediaImage {\n          ...SectionImageWithTextMediaImage\n        }\n      }\n    }\n  }\n  #graphql\n  fragment SectionImageWithTextMediaImage on MediaImage {\n    image {\n      altText\n      url\n      width\n      height\n    }\n  }\n\n\n  #graphql\n  fragment SectionVideo on Metaobject {\n    type\n    id\n    heading: field(key: "heading") {\n      key\n      value\n      type\n    }\n    subheading: field(key: "subheading") {\n      key\n      value\n      type\n    }\n    video_url: field(key: "video_url") {\n      key\n      value\n      type\n    }\n    video_file: field(key: "video_file") {\n      reference {\n        ... on Video {\n          sources {\n            url\n            mimeType\n          }\n        }\n      }\n    }\n    poster_image: field(key: "poster_image") {\n      reference {\n        ... on MediaImage {\n          image {\n            url\n            altText\n          }\n        }\n      }\n    }\n    autoplay: field(key: "autoplay") {\n      key\n      value\n    }\n    loop: field(key: "loop") {\n      key\n      value\n    }\n    muted: field(key: "muted") {\n      key\n      value\n    }\n  }\n\n  #graphql\n  fragment SectionTestimonials on Metaobject {\n    type\n    id\n    heading: field(key: "heading") {\n      key\n      value\n      type\n    }\n    testimonials: field(key: "testimonials") {\n      references(first: 10) {\n        nodes {\n          ... on Metaobject {\n            ...Testimonial\n          }\n        }\n      }\n    }\n  }\n  #graphql\n  fragment Testimonial on Metaobject {\n    id\n    quote: field(key: "quote") {\n      key\n      value\n    }\n    author: field(key: "author") {\n      key\n      value\n    }\n    role: field(key: "role") {\n      key\n      value\n    }\n    rating: field(key: "rating") {\n      key\n      value\n    }\n    avatar: field(key: "avatar") {\n      reference {\n        ... on MediaImage {\n          image {\n            url\n            altText\n          }\n        }\n      }\n    }\n  }\n\n\n  #graphql\n  fragment SectionLogos on Metaobject {\n    type\n    id\n    heading: field(key: "heading") {\n      key\n      value\n      type\n    }\n    grayscale: field(key: "grayscale") {\n      key\n      value\n    }\n    logos: field(key: "logos") {\n      references(first: 20) {\n        nodes {\n          ... on MediaImage {\n            image {\n              url\n              altText\n            }\n          }\n        }\n      }\n    }\n  }\n\n  #graphql\n  fragment SectionFAQ on Metaobject {\n    type\n    id\n    heading: field(key: "heading") {\n      key\n      value\n      type\n    }\n    subheading: field(key: "subheading") {\n      key\n      value\n      type\n    }\n    faqs: field(key: "faqs") {\n      references(first: 20) {\n        nodes {\n          ... on Metaobject {\n            ...FAQItem\n          }\n        }\n      }\n    }\n  }\n  #graphql\n  fragment FAQItem on Metaobject {\n    id\n    question: field(key: "question") {\n      key\n      value\n    }\n    answer: field(key: "answer") {\n      key\n      value\n    }\n  }\n\n\n  #graphql\n  fragment SectionFeatures on Metaobject {\n    type\n    id\n    heading: field(key: "heading") {\n      key\n      value\n      type\n    }\n    subheading: field(key: "subheading") {\n      key\n      value\n      type\n    }\n    columns: field(key: "columns") {\n      key\n      value\n    }\n    features: field(key: "features") {\n      references(first: 12) {\n        nodes {\n          ... on Metaobject {\n            ...FeatureItem\n          }\n        }\n      }\n    }\n  }\n  #graphql\n  fragment FeatureItem on Metaobject {\n    id\n    title: field(key: "title") {\n      key\n      value\n    }\n    description: field(key: "description") {\n      key\n      value\n    }\n    icon: field(key: "icon") {\n      key\n      value\n    }\n    icon_image: field(key: "icon_image") {\n      reference {\n        ... on MediaImage {\n          image {\n            url\n            altText\n          }\n        }\n      }\n    }\n  }\n\n\n  #graphql\n  fragment SectionBanner on Metaobject {\n    type\n    id\n    text: field(key: "text") {\n      key\n      value\n      type\n    }\n    link_text: field(key: "link_text") {\n      key\n      value\n      type\n    }\n    link_url: field(key: "link_url") {\n      key\n      value\n      type\n    }\n    background_color: field(key: "background_color") {\n      key\n      value\n      type\n    }\n    text_color: field(key: "text_color") {\n      key\n      value\n      type\n    }\n  }\n\n  #graphql\n  fragment SectionCountdown on Metaobject {\n    type\n    id\n    heading: field(key: "heading") {\n      key\n      value\n      type\n    }\n    subheading: field(key: "subheading") {\n      key\n      value\n      type\n    }\n    end_date: field(key: "end_date") {\n      key\n      value\n    }\n    expired_text: field(key: "expired_text") {\n      key\n      value\n      type\n    }\n    button_text: field(key: "button_text") {\n      key\n      value\n      type\n    }\n    button_link: field(key: "button_link") {\n      key\n      value\n      type\n    }\n    background_color: field(key: "background_color") {\n      key\n      value\n      type\n    }\n    text_color: field(key: "text_color") {\n      key\n      value\n      type\n    }\n  }\n\n  #graphql\n  fragment SectionNewsletter on Metaobject {\n    type\n    id\n    heading: field(key: "heading") {\n      key\n      value\n      type\n    }\n    placeholder: field(key: "placeholder") {\n      key\n      value\n      type\n    }\n    social_text: field(key: "social_text") {\n      key\n      value\n      type\n    }\n    twitter_url: field(key: "twitter_url") {\n      key\n      value\n    }\n    instagram_url: field(key: "instagram_url") {\n      key\n      value\n    }\n    facebook_url: field(key: "facebook_url") {\n      key\n      value\n    }\n    youtube_url: field(key: "youtube_url") {\n      key\n      value\n    }\n    pinterest_url: field(key: "pinterest_url") {\n      key\n      value\n    }\n    tiktok_url: field(key: "tiktok_url") {\n      key\n      value\n    }\n  }\n\n\n': {
+    return: RouteContentQuery;
+    variables: RouteContentQueryVariables;
   };
 }
 
