@@ -1,7 +1,7 @@
 import type {V2_MetaFunction} from '@shopify/remix-oxygen';
 import {defer, type LoaderArgs} from '@shopify/remix-oxygen';
 import {Await, useLoaderData, Link} from '@remix-run/react';
-import {Suspense} from 'react';
+import {Suspense, useState} from 'react';
 import {Image, Money} from '@shopify/hydrogen';
 import type {
   FeaturedCollectionFragment,
@@ -13,6 +13,7 @@ import {
   hasRouteContent,
   type RouteContentData,
 } from '~/sections';
+import {ProductQuickView, QuickViewButton} from '~/components/ProductQuickView';
 
 export const meta: V2_MetaFunction = () => {
   return [{title: 'Mock.shop | Home'}];
@@ -43,6 +44,7 @@ export async function loader({context}: LoaderArgs) {
 
 export default function Homepage() {
   const data = useLoaderData<typeof loader>();
+  const [quickViewHandle, setQuickViewHandle] = useState<string | null>(null);
 
   // If CMS content exists, use it
   if (hasRouteContent(data.route)) {
@@ -57,10 +59,19 @@ export default function Homepage() {
   return (
     <div className="home">
       <HeroSection />
-      <NewArrivalsSection products={data.recommendedProducts} />
+      <NewArrivalsSection
+        products={data.recommendedProducts}
+        onQuickView={setQuickViewHandle}
+      />
       <BrandValuesSection />
       <MidweightSection />
       <NewsletterSection />
+
+      <ProductQuickView
+        isOpen={!!quickViewHandle}
+        onClose={() => setQuickViewHandle(null)}
+        productHandle={quickViewHandle}
+      />
     </div>
   );
 }
@@ -85,8 +96,10 @@ function HeroSection() {
 
 function NewArrivalsSection({
   products,
+  onQuickView,
 }: {
   products: Promise<RecommendedProductsQuery>;
+  onQuickView: (handle: string) => void;
 }) {
   return (
     <section className="new-arrivals">
@@ -99,21 +112,28 @@ function NewArrivalsSection({
           {({products}) => (
             <div className="new-arrivals-grid">
               {products.nodes.map((product) => (
-                <Link
-                  key={product.id}
-                  className="new-arrivals-product"
-                  to={`/products/${product.handle}`}
-                >
-                  <Image
-                    data={product.images.nodes[0]}
-                    aspectRatio="1/1"
-                    sizes="(min-width: 45em) 20vw, 50vw"
-                  />
-                  <h4>{product.title}</h4>
-                  <small>
-                    <Money data={product.priceRange.minVariantPrice} />
-                  </small>
-                </Link>
+                <div key={product.id} className="new-arrivals-product">
+                  <Link
+                    className="new-arrivals-product-link"
+                    to={`/products/${product.handle}`}
+                  >
+                    <div className="new-arrivals-product-image">
+                      <Image
+                        data={product.images.nodes[0]}
+                        aspectRatio="1/1"
+                        sizes="(min-width: 45em) 20vw, 50vw"
+                      />
+                      <QuickViewButton
+                        productHandle={product.handle}
+                        onQuickView={onQuickView}
+                      />
+                    </div>
+                    <h4>{product.title}</h4>
+                    <small>
+                      <Money data={product.priceRange.minVariantPrice} />
+                    </small>
+                  </Link>
+                </div>
               ))}
             </div>
           )}
