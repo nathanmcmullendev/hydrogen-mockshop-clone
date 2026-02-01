@@ -3261,6 +3261,12 @@ main {
   overflow: hidden;
 }
 
+.new-arrivals-product-image > a {
+  display: block;
+  position: relative;
+  z-index: 1;
+}
+
 .quickview-trigger {
   position: absolute;
   bottom: 12px;
@@ -3280,6 +3286,7 @@ main {
   transition: all 0.3s ease;
   z-index: 10;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  pointer-events: auto;
 }
 
 .quickview-trigger svg {
@@ -3601,6 +3608,7 @@ main {
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   z-index: 10;
+  pointer-events: auto;
 }
 
 .new-arrivals-product-image:hover .wishlist-button {
