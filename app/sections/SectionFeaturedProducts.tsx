@@ -1,7 +1,10 @@
+import {useState} from 'react';
 import {Money, Image} from '@shopify/hydrogen';
 import {Link} from '@remix-run/react';
 import type {ParsedMetafields} from '@shopify/hydrogen';
 import {parseSection} from '~/utils/parseSection';
+import {ProductQuickView, QuickViewButton} from '~/components/ProductQuickView';
+import {WishlistButton} from '~/components/Wishlist';
 
 /**
  * Featured Products section driven by Shopify Metaobjects.
@@ -15,6 +18,8 @@ import {parseSection} from '~/utils/parseSection';
  *   - show_prices (True/false)
  */
 export function SectionFeaturedProducts(props: SectionFeaturedProductsFragment) {
+  const [quickViewHandle, setQuickViewHandle] = useState<string | null>(null);
+
   const section = parseSection<
     SectionFeaturedProductsFragment,
     {
@@ -40,30 +45,55 @@ export function SectionFeaturedProducts(props: SectionFeaturedProductsFragment) 
         <div className="new-arrivals-grid">
           {products.nodes.map((product) => {
             const variant = product.variants?.nodes?.[0];
+            const image = variant?.image || product.featuredImage;
             return (
-              <Link
-                key={product.id}
-                className="new-arrivals-product"
-                to={`/products/${product.handle}`}
-              >
-                {variant?.image && (
-                  <Image
-                    data={variant.image}
-                    aspectRatio="1/1"
-                    sizes="(min-width: 45em) 20vw, 50vw"
+              <div key={product.id} className="new-arrivals-product">
+                <div className="new-arrivals-product-image">
+                  <Link to={`/products/${product.handle}`}>
+                    {image && (
+                      <Image
+                        data={image}
+                        aspectRatio="1/1"
+                        sizes="(min-width: 45em) 20vw, 50vw"
+                      />
+                    )}
+                  </Link>
+                  <WishlistButton
+                    product={{
+                      id: product.id,
+                      handle: product.handle,
+                      title: product.title,
+                      price: product.priceRange.minVariantPrice,
+                      image: image,
+                    }}
                   />
-                )}
-                <h4>{product.title}</h4>
-                {showPrices && (
-                  <small>
-                    <Money data={product.priceRange.minVariantPrice} />
-                  </small>
-                )}
-              </Link>
+                  <QuickViewButton
+                    productHandle={product.handle}
+                    onQuickView={setQuickViewHandle}
+                  />
+                </div>
+                <Link
+                  className="new-arrivals-product-info"
+                  to={`/products/${product.handle}`}
+                >
+                  <h4>{product.title}</h4>
+                  {showPrices && (
+                    <small>
+                      <Money data={product.priceRange.minVariantPrice} />
+                    </small>
+                  )}
+                </Link>
+              </div>
             );
           })}
         </div>
       )}
+
+      <ProductQuickView
+        isOpen={!!quickViewHandle}
+        onClose={() => setQuickViewHandle(null)}
+        productHandle={quickViewHandle}
+      />
     </section>
   );
 }
@@ -93,6 +123,12 @@ export interface SectionFeaturedProductsFragment {
         id: string;
         title: string;
         handle: string;
+        featuredImage?: {
+          altText?: string;
+          width?: number;
+          height?: number;
+          url: string;
+        };
         variants?: {
           nodes: Array<{
             image?: {
