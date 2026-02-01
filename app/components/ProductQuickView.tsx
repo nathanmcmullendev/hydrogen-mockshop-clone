@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useState, useEffect, useRef} from 'react';
 import {useFetcher, Link} from '@remix-run/react';
 import {Image, Money, CartForm} from '@shopify/hydrogen';
 import type {CartLineInput} from '@shopify/hydrogen/storefront-api-types';
@@ -50,14 +50,21 @@ export function ProductQuickView({
   const fetcher = useFetcher<{product: QuickViewProduct}>();
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
   const [quantity, setQuantity] = useState(1);
+  const lastFetchedHandle = useRef<string | null>(null);
 
-  // Fetch product data when modal opens
-  if (isOpen && productHandle && fetcher.state === 'idle' && !fetcher.data) {
-    fetcher.load(`/api/product-quickview?handle=${productHandle}`);
-  }
+  // Fetch product data when modal opens or product handle changes
+  useEffect(() => {
+    if (isOpen && productHandle && productHandle !== lastFetchedHandle.current) {
+      lastFetchedHandle.current = productHandle;
+      setSelectedOptions({});
+      setQuantity(1);
+      fetcher.load(`/api/product-quickview?handle=${productHandle}`);
+    }
+  }, [isOpen, productHandle]);
 
-  // Reset state when modal closes
+  // Reset tracking when modal closes
   const handleClose = () => {
+    lastFetchedHandle.current = null;
     setSelectedOptions({});
     setQuantity(1);
     onClose();
