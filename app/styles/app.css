@@ -253,7 +253,7 @@ ul, ol {
 .overlay .close-outside {
   position: absolute;
   top: 0;
-  right: 0;
+  left: 0;
   width: calc(100% - var(--aside-width));
   height: 100%;
   background: transparent;
@@ -261,7 +261,7 @@ ul, ol {
   cursor: pointer;
 }
 
-/* Left overlay - close button on right side */
+/* Left overlay (menu) - clickable area on right side */
 .overlay-left .close-outside {
   left: auto;
   right: 0;
