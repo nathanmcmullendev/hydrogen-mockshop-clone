@@ -3303,6 +3303,19 @@ main {
   color: #fff;
 }
 
+/* Mobile: Always show Quick View and Wishlist buttons */
+@media (max-width: 768px) {
+  .quickview-trigger {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .wishlist-button {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Quick View Modal Overlay */
 .quickview-overlay {
   position: fixed;
