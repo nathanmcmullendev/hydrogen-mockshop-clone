@@ -19,19 +19,29 @@ export async function action({request, context}: ActionArgs) {
     session.get('customerAccessToken'),
   ]);
 
-  const {action, inputs} = CartForm.getFormInput(formData);
-
-  if (!action) {
-    throw new Error('No action provided');
-  }
+  // Check for custom cartAction from Quick View
+  const cartAction = formData.get('cartAction');
 
   let status = 200;
   let result: CartQueryData;
 
-  switch (action) {
-    case CartForm.ACTIONS.LinesAdd:
-      result = await cart.addLines(inputs.lines);
-      break;
+  if (cartAction === 'ADD_TO_CART') {
+    // Handle Quick View add to cart
+    const linesJson = formData.get('lines');
+    const lines = linesJson ? JSON.parse(linesJson as string) : [];
+    result = await cart.addLines(lines);
+  } else {
+    // Handle standard CartForm actions
+    const {action, inputs} = CartForm.getFormInput(formData);
+
+    if (!action) {
+      throw new Error('No action provided');
+    }
+
+    switch (action) {
+      case CartForm.ACTIONS.LinesAdd:
+        result = await cart.addLines(inputs.lines);
+        break;
     case CartForm.ACTIONS.LinesUpdate:
       result = await cart.updateLines(inputs.lines);
       break;
@@ -61,6 +71,7 @@ export async function action({request, context}: ActionArgs) {
     }
     default:
       throw new Error(`${action} cart action is not defined`);
+    }
   }
 
   const cartId = result.cart.id;

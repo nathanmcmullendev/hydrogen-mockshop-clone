@@ -1,28 +1,87 @@
-# Hydrogen Vercel Starter
+# Hydrogen + Vercel + Metaobjects CMS
 
-A production-ready Shopify Hydrogen starter optimized for Vercel deployment. Works out of the box with `mock.shop` - no Shopify account needed to try it.
+A production-ready Shopify Hydrogen starter with a **free, open-source CMS layer** powered by Metaobjects. Deploy to Vercel in one click.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/nathanmcmullendev/hydrogen-mockshop-clone&env=SESSION_SECRET,PUBLIC_STORE_DOMAIN&envDescription=Required%20environment%20variables&envLink=https://github.com/nathanmcmullendev/hydrogen-mockshop-clone%23environment-variables&project-name=hydrogen-store&repository-name=hydrogen-store)
 
-**Live Demo:** https://hydrogen-vercel-fresh.vercel.app
+**[Live Demo](https://hydrogen-vercel-fresh-self.vercel.app)** | **[CMS Documentation](./app/sections/README.md)**
+
+![Homepage](./docs/screenshots/homepage-full.png)
+
+---
+
+## Why This Starter?
+
+### The Problem
+
+1. **Hydrogen + Vercel deployment is painful** - Documented developer frustration since 2022
+2. **Premium Hydrogen templates cost $49-$299** - Just for basic CMS functionality
+3. **Setting up metaobjects from scratch takes days** - Boilerplate code, GraphQL fragments, type definitions
+
+### The Solution
+
+This starter gives you:
+
+| Feature | Value |
+|---------|-------|
+| **14 CMS Section Types** | Hero, Products, Testimonials, FAQ, Newsletter, and more |
+| **Vercel-Optimized** | Zero-config deployment, works out of the box |
+| **Works Without Shopify** | Uses `mock.shop` by default - try it instantly |
+| **Static Fallback** | Beautiful homepage even without metaobjects configured |
+| **Full TypeScript** | Complete type safety with generated Storefront API types |
+
+**Free alternative to:**
+- Ciseco ($49) - 15 section types
+- Owen ($299) - Premium Hydrogen template
+- Custom development (days of work)
 
 ---
 
 ## Features
 
-- **Metaobjects CMS** - 14 section types for visual page building (free alternative to $49+ templates)
-- **Vercel-optimized** - Deploys with zero configuration
-- **Full e-commerce** - Collections, products, cart, checkout
-- **Search** - Product search with filters
-- **Responsive** - Mobile-first design
-- **TypeScript** - Full type safety
+### Quick View Modal
+
+Preview products without leaving the page. Includes variant selection and add-to-cart.
+
+![Quick View](./docs/screenshots/quickview-modal.png)
+
+### Product Pages
+
+Full product experience with color swatches, quantity selector, image zoom, and expandable descriptions.
+
+![Product Page](./docs/screenshots/product-page.png)
+
+### Search with Filters
+
+Real-time search with availability filters and multiple sort options.
+
+![Search](./docs/screenshots/search-results.png)
+
+### Collections
+
+Clean collection grid with product counts and descriptions.
+
+![Collections](./docs/screenshots/collections.png)
+
+### Cart Drawer
+
+Slide-out cart with full line item management, quantity controls, and discount codes.
+
+![Cart](./docs/screenshots/cart-drawer.png)
+
+### Additional Features
+
+- **Wishlist** - localStorage-persisted, works across sessions
+- **Customer Accounts** - Login, register, order history
+- **Mobile-First** - Responsive design with hamburger menu
 - **SEO Ready** - Meta tags, sitemap, robots.txt
-- **Customer accounts** - Login, register, order history
-- **Static fallback** - Works without metaobjects configured
+- **Localization** - Multi-currency and language selectors
+
+---
 
 ## Quick Start
 
-### Try without Shopify account
+### Try Without a Shopify Account
 
 ```bash
 git clone https://github.com/nathanmcmullendev/hydrogen-mockshop-clone.git
@@ -31,81 +90,80 @@ npm install --legacy-peer-deps
 npm run dev
 ```
 
-Uses `mock.shop` by default - no Shopify account needed!
+Open http://localhost:3000 - uses `mock.shop` by default.
 
-Open http://localhost:3000
+### Connect Your Shopify Store
 
-### Connect your Shopify store
+1. Create `.env` from example:
+   ```bash
+   cp .env.example .env
+   ```
 
-1. Create a Hydrogen storefront in Shopify Admin
-2. Go to Settings > Apps > Develop apps > Create app
-3. Configure Storefront API access
-4. Copy your credentials to `.env`:
+2. Add your credentials:
+   ```env
+   SESSION_SECRET="your-secret-key-min-32-chars"
+   PUBLIC_STORE_DOMAIN="your-store.myshopify.com"
+   PUBLIC_STOREFRONT_API_TOKEN="your-storefront-token"
+   ```
 
-```bash
-cp .env.example .env
+3. Run dev server:
+   ```bash
+   npm run dev
+   ```
+
+---
+
+## Metaobjects CMS (14 Section Types)
+
+Build pages visually in Shopify Admin using native Metaobjects - no external CMS required.
+
+### How It Works
+
+```
+Without Metaobjects → Static homepage (works out of box)
+With Metaobjects    → CMS-driven content (full control)
 ```
 
-```env
-SESSION_SECRET="your-secret-key-min-32-chars"
-PUBLIC_STORE_DOMAIN="your-store.myshopify.com"
-PUBLIC_STOREFRONT_API_TOKEN="your-storefront-token"
-```
+### Available Sections
+
+| Category | Sections | Use Cases |
+|----------|----------|-----------|
+| **Hero** | Hero, Hero Slider | Landing pages, promotions |
+| **Products** | Featured Products, Collection Grid | Homepage showcases |
+| **Content** | Rich Text, Image+Text, Video | About pages, storytelling |
+| **Social Proof** | Testimonials, Logos | Trust building |
+| **Utility** | FAQ, Features, Banner, Countdown, Newsletter | Conversions |
+
+### Setting Up CMS Mode
+
+1. **Create metaobject definitions** in Shopify Admin → Content → Metaobjects
+2. **Create a `route` metaobject** with handle `route-home`
+3. **Add section references** to the route
+4. **Homepage switches automatically** to CMS-driven content
+
+Full setup guide: [app/sections/README.md](./app/sections/README.md)
 
 ---
 
 ## Deploy to Vercel
 
-### Option 1: One-Click Deploy
+### One-Click Deploy
 
-Click the button at the top of this README. You'll need to set:
+Click the button at the top. Set these environment variables:
 
 | Variable | Value |
 |----------|-------|
 | `SESSION_SECRET` | Any string, min 32 characters |
 | `PUBLIC_STORE_DOMAIN` | `mock.shop` or `your-store.myshopify.com` |
 
-### Option 2: CLI Deploy
+### CLI Deploy
 
 ```bash
 npm i -g vercel
 vercel
 ```
 
-Add environment variables in the Vercel dashboard under Project Settings > Environment Variables.
-
----
-
-## Environment Variables
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `SESSION_SECRET` | Yes | Session encryption key (min 32 chars) |
-| `PUBLIC_STORE_DOMAIN` | Yes | `mock.shop` or `your-store.myshopify.com` |
-| `PUBLIC_STOREFRONT_API_TOKEN` | For real stores | Storefront API public token |
-| `PRIVATE_STOREFRONT_API_TOKEN` | Optional | Storefront API private token |
-
-See `.env.example` for full documentation.
-
----
-
-## Metaobjects CMS (14 Section Types)
-
-This template includes a free, open-source CMS layer powered by Shopify Metaobjects - matching premium templates like Ciseco ($49).
-
-| Category | Sections |
-|----------|----------|
-| **Hero** | Hero, Hero Slider |
-| **Products** | Featured Products, Collection Grid |
-| **Content** | Rich Text, Image With Text, Video |
-| **Social Proof** | Testimonials, Logos |
-| **Utility** | FAQ, Features, Banner, Countdown, Newsletter |
-
-**How it works:**
-- Without metaobjects → renders beautiful static homepage
-- With metaobjects → renders CMS-driven content
-
-See [app/sections/README.md](./app/sections/README.md) for full documentation and metaobject definitions.
+Add environment variables in Vercel Dashboard → Project Settings → Environment Variables.
 
 ---
 
@@ -113,47 +171,27 @@ See [app/sections/README.md](./app/sections/README.md) for full documentation an
 
 ```
 app/
-├── components/
-│   ├── Aside.tsx       # Drawer component (cart, menu)
-│   ├── Cart.tsx        # Cart functionality
-│   ├── Footer.tsx      # Site footer
-│   ├── Header.tsx      # Site header with navigation
-│   ├── Layout.tsx      # Main layout wrapper
-│   └── Search.tsx      # Predictive search
-├── sections/           # Metaobjects CMS (14 section types)
-│   ├── Sections.tsx    # Dynamic section router
-│   ├── RouteContent.tsx # Route query component
+├── components/        # Header, Footer, Cart, Search, Wishlist
+├── routes/            # File-based routing (Remix convention)
+├── sections/          # 14 CMS section types
+│   ├── Sections.tsx   # Dynamic section router
 │   ├── SectionHero.tsx
 │   ├── SectionFeaturedProducts.tsx
-│   └── ...             # 12 more sections
-├── routes/
-│   ├── _index.tsx              # Homepage (with CMS support)
-│   ├── cart.tsx                # Cart page
-│   ├── collections._index.tsx  # All collections
-│   ├── collections.$handle.tsx # Collection detail
-│   ├── products.$handle.tsx    # Product detail
-│   ├── search.tsx              # Search results
-│   └── $.tsx                   # 404 page
-├── styles/
-│   └── app.css         # All styles
-├── utils/
-│   └── parseSection.ts # Metafield parser utility
-└── root.tsx            # App root with providers
+│   └── ...
+├── styles/            # Tailwind + custom CSS
+└── utils/             # Metafield parser, helpers
 ```
 
 ---
 
-## Pages Included
+## Environment Variables
 
-| Route | Description |
-|-------|-------------|
-| `/` | Homepage with hero, featured products, newsletter |
-| `/collections` | All collections grid |
-| `/collections/:handle` | Collection with product grid |
-| `/products/:handle` | Product page with variants, zoom, add to cart |
-| `/search` | Search with filters |
-| `/cart` | Cart drawer |
-| `/account/*` | Customer account pages |
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `SESSION_SECRET` | Yes | Session encryption (min 32 chars) |
+| `PUBLIC_STORE_DOMAIN` | Yes | `mock.shop` or your Shopify domain |
+| `PUBLIC_STOREFRONT_API_TOKEN` | For real stores | Storefront API public token |
+| `PRIVATE_STOREFRONT_API_TOKEN` | Optional | Storefront API private token |
 
 ---
 
@@ -161,52 +199,42 @@ app/
 
 - [Hydrogen](https://hydrogen.shopify.dev/) - Shopify's React framework
 - [Remix](https://remix.run/) - Full-stack web framework
-- [Vercel](https://vercel.com/) - Deployment platform
 - [TypeScript](https://www.typescriptlang.org/) - Type safety
+- [Tailwind CSS](https://tailwindcss.com/) - Utility-first styling
+- [Vercel](https://vercel.com/) - Edge deployment
 
 ---
 
 ## Development
 
 ```bash
-# Install dependencies
-npm install --legacy-peer-deps
-
-# Start dev server
-npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
-
-# Type check
-npm run typecheck
-
-# Lint
-npm run lint
+npm run dev          # Start dev server
+npm run build        # Production build
+npm run typecheck    # Type checking
+npm run lint         # ESLint
 ```
 
 ---
 
-## Why This Starter?
+## Comparison
 
-Deploying Hydrogen to Vercel has been a documented pain point for 3+ years. This starter:
-
-- Pre-applies all required Vercel configuration
-- Works with `mock.shop` out of the box
-- **Free Metaobjects CMS** matching $49-299 premium templates
-- No paid CMS or platform lock-in required
-- One-click deploy to Vercel
-
-See [MARKET-RESEARCH-VERCEL-DEPLOYMENT.md](./MARKET-RESEARCH-VERCEL-DEPLOYMENT.md) for deployment research and [COMPETITIVE-ANALYSIS.md](./COMPETITIVE-ANALYSIS.md) for template comparison.
+| Feature | This Starter | Ciseco ($49) | Blueprint (Free) |
+|---------|--------------|--------------|------------------|
+| **CMS Section Types** | 14 | 15 | Basic |
+| **Metaobjects CMS** | Yes | Yes | Yes |
+| **Vercel Deploy** | One-click | Manual | One-click |
+| **Works Without Shopify** | Yes (mock.shop) | No | No |
+| **Static Fallback** | Yes | No | No |
+| **Quick View** | Yes | Yes | No |
+| **Wishlist** | Yes | Yes | No |
+| **TypeScript** | Full | Full | Partial |
+| **Open Source** | Yes | No | Yes |
 
 ---
 
 ## Contributing
 
-Issues and PRs welcome. Please test your changes with:
+PRs welcome. Please run before submitting:
 
 ```bash
 npm run build
@@ -218,4 +246,8 @@ npm run lint
 
 ## License
 
-MIT - Use this as a starting point for your own Hydrogen storefronts.
+MIT - Use freely for personal or commercial projects.
+
+---
+
+**Built for developers who want premium Hydrogen features without premium prices.**

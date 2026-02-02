@@ -1,6 +1,6 @@
 import {useState, useEffect, useRef} from 'react';
-import {useFetcher, Link} from '@remix-run/react';
-import {Image, Money, CartForm} from '@shopify/hydrogen';
+import {useFetcher, Link, useRevalidator} from '@remix-run/react';
+import {Image, Money} from '@shopify/hydrogen';
 import type {CartLineInput} from '@shopify/hydrogen/storefront-api-types';
 
 interface QuickViewProduct {
@@ -47,10 +47,13 @@ export function ProductQuickView({
   onClose: () => void;
   productHandle: string | null;
 }) {
-  const fetcher = useFetcher<{product: QuickViewProduct}>();
+  const productFetcher = useFetcher<{product: QuickViewProduct}>();
+  const cartFetcher = useFetcher();
+  const revalidator = useRevalidator();
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
   const [quantity, setQuantity] = useState(1);
   const lastFetchedHandle = useRef<string | null>(null);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   // Fetch product data when modal opens or product handle changes
   useEffect(() => {
@@ -58,9 +61,28 @@ export function ProductQuickView({
       lastFetchedHandle.current = productHandle;
       setSelectedOptions({});
       setQuantity(1);
-      fetcher.load(`/api/product-quickview?handle=${productHandle}`);
+      setIsAddingToCart(false);
+      productFetcher.load(`/api/product-quickview?handle=${productHandle}`);
     }
   }, [isOpen, productHandle]);
+
+  // Handle cart submission completion
+  useEffect(() => {
+    if (isAddingToCart && cartFetcher.state === 'idle' && cartFetcher.data) {
+      // Cart submission completed - revalidate to get fresh cart data
+      revalidator.revalidate();
+      // Close modal and open cart drawer
+      onClose();
+      lastFetchedHandle.current = null;
+      setSelectedOptions({});
+      setQuantity(1);
+      setIsAddingToCart(false);
+      // Small delay to ensure revalidation starts before opening cart
+      setTimeout(() => {
+        window.location.hash = '#cart-aside';
+      }, 100);
+    }
+  }, [cartFetcher.state, cartFetcher.data, isAddingToCart, revalidator, onClose]);
 
   // Reset tracking when modal closes
   const handleClose = () => {
@@ -72,8 +94,8 @@ export function ProductQuickView({
 
   if (!isOpen) return null;
 
-  const product = fetcher.data?.product;
-  const isLoading = fetcher.state === 'loading' || !product;
+  const product = productFetcher.data?.product;
+  const isLoading = productFetcher.state === 'loading' || !product;
 
   // Find selected variant based on selected options
   const selectedVariant = product?.variants.nodes.find((variant) =>
@@ -178,29 +200,31 @@ export function ProductQuickView({
               </div>
 
               {/* Add to Cart */}
-              <CartForm
-                route="/cart"
-                inputs={{
-                  lines: selectedVariant
-                    ? [{merchandiseId: selectedVariant.id, quantity}]
-                    : [],
+              <button
+                type="button"
+                className="quickview-add-to-cart"
+                disabled={!selectedVariant?.availableForSale || isAddingToCart}
+                onClick={() => {
+                  if (!selectedVariant) return;
+                  setIsAddingToCart(true);
+                  const formData = new FormData();
+                  formData.append('cartAction', 'ADD_TO_CART');
+                  formData.append(
+                    'lines',
+                    JSON.stringify([{merchandiseId: selectedVariant.id, quantity}])
+                  );
+                  cartFetcher.submit(formData, {
+                    method: 'POST',
+                    action: '/cart',
+                  });
                 }}
-                action={CartForm.ACTIONS.LinesAdd}
               >
-                <button
-                  type="submit"
-                  className="quickview-add-to-cart"
-                  disabled={!selectedVariant?.availableForSale}
-                  onClick={() => {
-                    setTimeout(() => {
-                      handleClose();
-                      window.location.hash = '#cart-aside';
-                    }, 300);
-                  }}
-                >
-                  {selectedVariant?.availableForSale ? 'Add to Cart' : 'Sold Out'}
-                </button>
-              </CartForm>
+                {isAddingToCart
+                  ? 'Adding...'
+                  : selectedVariant?.availableForSale
+                  ? 'Add to Cart'
+                  : 'Sold Out'}
+              </button>
 
               {/* View Full Details Link */}
               <Link
