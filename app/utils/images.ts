@@ -10,18 +10,14 @@
  */
 
 /**
- * Cloudinary cloud name - set at BUILD TIME by Vite
- * This gets baked into the client bundle, so it works in browser
- * On server/edge, this may be empty string (falls back to Shopify CDN)
+ * Cloudinary cloud name
+ *
+ * NOTE: Hardcoded because import.meta.env doesn't work reliably in Hydrogen's
+ * edge runtime. This matches the VITE_CLOUDINARY_CLOUD value in Vercel.
+ *
+ * To change: Update this value and VITE_CLOUDINARY_CLOUD in Vercel together.
  */
-const CLOUDINARY_CLOUD = (() => {
-  try {
-    // Vite replaces this at build time for client bundles
-    return import.meta.env?.VITE_CLOUDINARY_CLOUD || '';
-  } catch {
-    return '';
-  }
-})();
+const CLOUDINARY_CLOUD = 'dh4qwuvuo';
 
 export interface ImageOptions {
   width?: number;
