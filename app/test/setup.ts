@@ -69,9 +69,50 @@ const originalError = console.error;
 console.error = (...args: unknown[]) => {
   if (
     typeof args[0] === 'string' &&
-    args[0].includes('Warning: ReactDOM.render is no longer supported')
+    (args[0].includes('Warning: ReactDOM.render is no longer supported') ||
+      args[0].includes('Warning: An update to') ||
+      args[0].includes('act(...)'))
   ) {
     return;
   }
   originalError.call(console, ...args);
 };
+
+/**
+ * Mock window.scrollTo
+ * jsdom doesn't implement scrollTo, needed for some navigation tests.
+ */
+Object.defineProperty(window, 'scrollTo', {
+  writable: true,
+  value: vi.fn(),
+});
+
+/**
+ * Mock IntersectionObserver
+ * Used by lazy loading and infinite scroll components.
+ */
+class MockIntersectionObserver {
+  observe = vi.fn();
+  unobserve = vi.fn();
+  disconnect = vi.fn();
+}
+
+Object.defineProperty(window, 'IntersectionObserver', {
+  writable: true,
+  value: MockIntersectionObserver,
+});
+
+/**
+ * Mock ResizeObserver
+ * Used by responsive components.
+ */
+class MockResizeObserver {
+  observe = vi.fn();
+  unobserve = vi.fn();
+  disconnect = vi.fn();
+}
+
+Object.defineProperty(window, 'ResizeObserver', {
+  writable: true,
+  value: MockResizeObserver,
+});
