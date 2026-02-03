@@ -5,6 +5,7 @@ import {
   getOptimizedImageUrl,
   generateSrcSet,
   getLqipUrl,
+  getCloudinaryCloud,
   type ImageOptions,
 } from '~/utils/images';
 
@@ -65,7 +66,10 @@ export function OptimizedImage({
     return null;
   }
 
-  // Generate optimized URLs
+  // Check if Cloudinary is configured
+  const cloudinaryCloud = getCloudinaryCloud();
+
+  // Generate optimized URLs (uses Cloudinary if configured)
   const optimizedSrc = getOptimizedImageUrl(imageUrl, {
     width,
     height,
@@ -74,9 +78,9 @@ export function OptimizedImage({
   const srcSet = generateSrcSet(imageUrl, undefined, imageOptions);
   const placeholderUrl = showPlaceholder ? getLqipUrl(imageUrl) : undefined;
 
-  // If we have Shopify image data, prefer using Hydrogen's Image component
-  // as it handles srcset generation and aspect ratio correctly
-  if (data) {
+  // If Cloudinary is NOT configured and we have Shopify image data,
+  // use Hydrogen's Image component for its built-in Shopify CDN optimization
+  if (!cloudinaryCloud && data) {
     return (
       <div className={`optimized-image-wrapper ${className}`} style={{position: 'relative'}}>
         {showPlaceholder && !isLoaded && placeholderUrl && (
@@ -110,7 +114,8 @@ export function OptimizedImage({
     );
   }
 
-  // For direct src URLs, use native img with our optimization
+  // When Cloudinary IS configured (or no data object), use native img
+  // with our Cloudinary-optimized URLs
   return (
     <div className={`optimized-image-wrapper ${className}`} style={{position: 'relative'}}>
       {showPlaceholder && !isLoaded && placeholderUrl && (
