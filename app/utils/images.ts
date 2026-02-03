@@ -14,13 +14,14 @@ export interface ImageOptions {
 
 /**
  * Get the Cloudinary cloud name from environment
+ * Uses Vite's import.meta.env which is statically replaced at build time
  * Returns undefined if not configured (will fall back to Shopify CDN)
  */
 export function getCloudinaryCloud(): string | undefined {
-  if (typeof window !== 'undefined') {
-    return (window as any).ENV?.VITE_CLOUDINARY_CLOUD;
-  }
-  return undefined;
+  // Vite automatically exposes VITE_* env vars via import.meta.env
+  // This is replaced at build time, so it works on both server and client
+  // without hydration issues
+  return import.meta.env.VITE_CLOUDINARY_CLOUD || undefined;
 }
 
 /**

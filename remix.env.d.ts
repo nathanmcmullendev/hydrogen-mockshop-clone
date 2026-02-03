@@ -1,12 +1,26 @@
 /// <reference types="@remix-run/dev" />
 /// <reference types="@shopify/remix-oxygen" />
 /// <reference types="@shopify/oxygen-workers-types" />
+/// <reference types="vite/client" />
 
 // Enhance TypeScript's built-in typings.
 import '@total-typescript/ts-reset';
 
 import type {Storefront, HydrogenCart} from '@shopify/hydrogen';
 import type {HydrogenSession} from './server';
+
+/**
+ * Vite environment variables (VITE_* prefix)
+ * These are statically replaced at build time and available on client
+ */
+interface ImportMetaEnv {
+  readonly VITE_CLOUDINARY_CLOUD?: string;
+  readonly VITE_STRIPE_PUBLIC_KEY?: string;
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}
 
 declare global {
   /**
