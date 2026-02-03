@@ -267,7 +267,7 @@ function ProductPrice({
         )
       )}
       <p className="product-shipping-notice">
-        <Link to="/policies/shipping-policy">Shipping</Link> calculated at checkout.
+        Shipping calculated at checkout.
       </p>
     </div>
   );

@@ -160,7 +160,7 @@ function BrandValuesSection() {
     <section className="brand-values">
       <h2>Liquid combines comfort, style, and sustainability. Our products are made from organic cotton and crafted in Canada.</h2>
       <h2>Each product features a minimalist aesthetic, with clean lines and neutral colors.</h2>
-      <h2>Join the Liquid movement today and <Link to="/collections/all">elevate your style</Link>.</h2>
+      <h2>Join the Liquid movement today and <Link to="/products">elevate your style</Link>.</h2>
     </section>
   );
 }
