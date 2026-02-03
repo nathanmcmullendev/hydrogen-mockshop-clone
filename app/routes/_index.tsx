@@ -2,7 +2,7 @@ import type {V2_MetaFunction} from '@shopify/remix-oxygen';
 import {defer, type LoaderArgs} from '@shopify/remix-oxygen';
 import {Await, useLoaderData, Link} from '@remix-run/react';
 import {Suspense, useState} from 'react';
-import {Image, Money} from '@shopify/hydrogen';
+import {Money} from '@shopify/hydrogen';
 import type {
   FeaturedCollectionFragment,
   RecommendedProductsQuery,
@@ -15,6 +15,12 @@ import {
 } from '~/sections';
 import {ProductQuickView, QuickViewButton} from '~/components/ProductQuickView';
 import {WishlistButton} from '~/components/Wishlist';
+import {
+  getOptimizedImageUrl,
+  getSrcSet,
+  getSizes,
+  IMAGE_SIZES,
+} from '~/utils/images';
 
 export const meta: V2_MetaFunction = () => {
   return [{title: 'Mock.shop | Home'}];
@@ -112,46 +118,105 @@ function NewArrivalsSection({
         <Await resolve={products}>
           {({products}) => (
             <div className="new-arrivals-grid">
-              {products.nodes.map((product) => (
-                <div key={product.id} className="new-arrivals-product">
-                  <div className="new-arrivals-product-image">
-                    <Link to={`/products/${product.handle}`}>
-                      <Image
-                        data={product.images.nodes[0]}
-                        aspectRatio="1/1"
-                        sizes="(min-width: 45em) 20vw, 50vw"
+              {products.nodes.map((product, index) => {
+                const image = product.images.nodes[0];
+                const imageUrl = image?.url;
+                const imageSrc = imageUrl
+                  ? getOptimizedImageUrl(imageUrl, IMAGE_SIZES.thumbnail)
+                  : '';
+                const imageSrcSet = imageUrl
+                  ? getSrcSet(imageUrl, [200, 400, 600, 800])
+                  : '';
+                const imageSizes = getSizes({
+                  '(max-width: 640px)': '50vw',
+                  '(max-width: 1024px)': '33vw',
+                  default: '20vw',
+                });
+                // First 4 products are above the fold
+                const priority = index < 4;
+
+                return (
+                  <div key={product.id} className="new-arrivals-product">
+                    <div className="new-arrivals-product-image">
+                      <Link to={`/products/${product.handle}`}>
+                        {imageUrl ? (
+                          <ProductImage
+                            src={imageSrc}
+                            srcSet={imageSrcSet}
+                            sizes={imageSizes}
+                            alt={image?.altText || product.title}
+                            priority={priority}
+                          />
+                        ) : (
+                          <div className="product-image-placeholder" />
+                        )}
+                      </Link>
+                      <WishlistButton
+                        product={{
+                          id: product.id,
+                          handle: product.handle,
+                          title: product.title,
+                          price: product.priceRange.minVariantPrice,
+                          image: product.images.nodes[0],
+                        }}
                       />
+                      <QuickViewButton
+                        productHandle={product.handle}
+                        onQuickView={onQuickView}
+                      />
+                    </div>
+                    <Link
+                      className="new-arrivals-product-info"
+                      to={`/products/${product.handle}`}
+                    >
+                      <h4>{product.title}</h4>
+                      <small>
+                        <Money data={product.priceRange.minVariantPrice} />
+                      </small>
                     </Link>
-                    <WishlistButton
-                      product={{
-                        id: product.id,
-                        handle: product.handle,
-                        title: product.title,
-                        price: product.priceRange.minVariantPrice,
-                        image: product.images.nodes[0],
-                      }}
-                    />
-                    <QuickViewButton
-                      productHandle={product.handle}
-                      onQuickView={onQuickView}
-                    />
                   </div>
-                  <Link
-                    className="new-arrivals-product-info"
-                    to={`/products/${product.handle}`}
-                  >
-                    <h4>{product.title}</h4>
-                    <small>
-                      <Money data={product.priceRange.minVariantPrice} />
-                    </small>
-                  </Link>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </Await>
       </Suspense>
     </section>
+  );
+}
+
+/**
+ * Product image with loading state for home page
+ */
+function ProductImage({
+  src,
+  srcSet,
+  sizes,
+  alt,
+  priority,
+}: {
+  src: string;
+  srcSet: string;
+  sizes: string;
+  alt: string;
+  priority: boolean;
+}) {
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  return (
+    <img
+      src={src}
+      srcSet={srcSet}
+      sizes={sizes}
+      alt={alt}
+      loading={priority ? 'eager' : 'lazy'}
+      fetchPriority={priority ? 'high' : 'auto'}
+      width={400}
+      height={400}
+      onLoad={() => setIsLoaded(true)}
+      className={`product-image ${isLoaded ? 'loaded' : ''}`}
+      style={{aspectRatio: '1/1', objectFit: 'cover'}}
+    />
   );
 }
 

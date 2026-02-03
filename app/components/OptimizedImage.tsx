@@ -1,21 +1,16 @@
-import {Image} from '@shopify/hydrogen';
-import type {Image as ImageType} from '@shopify/hydrogen/storefront-api-types';
 import {useState} from 'react';
 import {
   getOptimizedImageUrl,
-  generateSrcSet,
+  getSrcSet,
   getLqipUrl,
-  getCloudinaryCloud,
-  type ImageOptions,
+  IMAGE_SIZES,
 } from '~/utils/images';
 
 interface OptimizedImageProps {
-  /** Shopify image data object */
-  data?: Pick<ImageType, 'url' | 'altText' | 'width' | 'height'> | null;
-  /** Direct image URL (alternative to data) */
-  src?: string;
+  /** Direct image URL */
+  src: string;
   /** Alt text for the image */
-  alt?: string;
+  alt: string;
   /** CSS aspect ratio (e.g., "1/1", "16/9") */
   aspectRatio?: string;
   /** Display width */
@@ -28,94 +23,52 @@ interface OptimizedImageProps {
   sizes?: string;
   /** Additional CSS classes */
   className?: string;
-  /** Image optimization options */
-  imageOptions?: ImageOptions;
+  /** Max image size (uses IMAGE_SIZES presets) */
+  maxSize?: number;
   /** Whether to show blur placeholder while loading */
   showPlaceholder?: boolean;
+  /** Priority loading for above-fold images */
+  priority?: boolean;
 }
 
 /**
- * OptimizedImage component that uses Cloudinary CDN when available,
- * falling back to Shopify's built-in image CDN.
+ * OptimizedImage component that uses Cloudinary CDN for image optimization.
  *
  * Features:
- * - Automatic WebP/AVIF conversion
+ * - Automatic WebP/AVIF conversion via Cloudinary
  * - Responsive srcset generation
  * - Optional blur placeholder (LQIP)
- * - Graceful fallback to Shopify CDN
+ * - Priority loading support
+ * - Image reveal animation
  */
 export function OptimizedImage({
-  data,
   src,
   alt,
-  aspectRatio,
-  width,
-  height,
+  aspectRatio = '1/1',
+  width = 400,
+  height = 400,
   loading = 'lazy',
   sizes = '100vw',
   className = '',
-  imageOptions = {},
+  maxSize = IMAGE_SIZES.thumbnail,
   showPlaceholder = false,
+  priority = false,
 }: OptimizedImageProps) {
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const imageUrl = src || data?.url;
-  const imageAlt = alt || data?.altText || '';
-
-  if (!imageUrl) {
-    return null;
+  if (!src) {
+    return <div className="product-image-placeholder" />;
   }
 
-  // Check if Cloudinary is configured
-  const cloudinaryCloud = getCloudinaryCloud();
+  // Generate Cloudinary optimized URLs
+  const optimizedSrc = getOptimizedImageUrl(src, maxSize);
+  const srcSet = getSrcSet(src, [200, 400, 600, 800, 1200]);
+  const placeholderUrl = showPlaceholder ? getLqipUrl(src) : undefined;
 
-  // Generate optimized URLs (uses Cloudinary if configured)
-  const optimizedSrc = getOptimizedImageUrl(imageUrl, {
-    width,
-    height,
-    ...imageOptions,
-  });
-  const srcSet = generateSrcSet(imageUrl, undefined, imageOptions);
-  const placeholderUrl = showPlaceholder ? getLqipUrl(imageUrl) : undefined;
+  // Determine loading behavior
+  const imgLoading = priority ? 'eager' : loading;
+  const fetchPriority = priority ? 'high' : 'auto';
 
-  // If Cloudinary is NOT configured and we have Shopify image data,
-  // use Hydrogen's Image component for its built-in Shopify CDN optimization
-  if (!cloudinaryCloud && data) {
-    return (
-      <div className={`optimized-image-wrapper ${className}`} style={{position: 'relative'}}>
-        {showPlaceholder && !isLoaded && placeholderUrl && (
-          <img
-            src={placeholderUrl}
-            alt=""
-            aria-hidden="true"
-            className="optimized-image-placeholder"
-            style={{
-              position: 'absolute',
-              inset: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              filter: 'blur(10px)',
-              transform: 'scale(1.1)',
-            }}
-          />
-        )}
-        <Image
-          data={data}
-          aspectRatio={aspectRatio}
-          width={width}
-          height={height}
-          loading={loading}
-          sizes={sizes}
-          className={className}
-          onLoad={() => setIsLoaded(true)}
-        />
-      </div>
-    );
-  }
-
-  // When Cloudinary IS configured (or no data object), use native img
-  // with our Cloudinary-optimized URLs
   return (
     <div className={`optimized-image-wrapper ${className}`} style={{position: 'relative'}}>
       {showPlaceholder && !isLoaded && placeholderUrl && (
@@ -123,6 +76,7 @@ export function OptimizedImage({
           src={placeholderUrl}
           alt=""
           aria-hidden="true"
+          className="optimized-image-placeholder"
           style={{
             position: 'absolute',
             inset: 0,
@@ -138,13 +92,14 @@ export function OptimizedImage({
         src={optimizedSrc}
         srcSet={srcSet}
         sizes={sizes}
-        alt={imageAlt}
+        alt={alt}
         width={width}
         height={height}
-        loading={loading}
-        className={className}
+        loading={imgLoading}
+        fetchPriority={fetchPriority}
         onLoad={() => setIsLoaded(true)}
-        style={aspectRatio ? {aspectRatio} : undefined}
+        className={`product-image ${isLoaded ? 'loaded' : ''}`}
+        style={{aspectRatio, objectFit: 'cover'}}
       />
     </div>
   );

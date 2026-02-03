@@ -987,11 +987,14 @@ main {
 }
 
 /* Image reveal animation - starts hidden, fades in on load */
-.product-image {
+.product-image,
+.product-main-image {
   opacity: 0;
+  transition: opacity 0.3s ease-in-out;
 }
 
-.product-image.loaded {
+.product-image.loaded,
+.product-main-image.loaded {
   opacity: 1;
 }
 

@@ -1,4 +1,4 @@
-import React, {Suspense} from 'react';
+import React, {Suspense, useState} from 'react';
 import type {V2_MetaFunction} from '@shopify/remix-oxygen';
 import {defer, redirect, type LoaderArgs} from '@shopify/remix-oxygen';
 import type {FetcherWithComponents} from '@remix-run/react';
@@ -10,7 +10,6 @@ import type {
 } from 'storefrontapi.generated';
 
 import {
-  Image,
   Money,
   VariantSelector,
   type VariantOption,
@@ -19,6 +18,12 @@ import {
 } from '@shopify/hydrogen';
 import type {CartLineInput} from '@shopify/hydrogen/storefront-api-types';
 import {getVariantUrl} from '~/utils';
+import {
+  getOptimizedImageUrl,
+  getSrcSet,
+  getSizes,
+  IMAGE_SIZES,
+} from '~/utils/images';
 
 export const meta: V2_MetaFunction = ({data}) => {
   return [{title: `Mock.shop | ${data?.product?.title ?? 'Product'}`}];
@@ -122,11 +127,24 @@ export default function Product() {
 }
 
 function ProductImage({image}: {image: ProductVariantFragment['image']}) {
-  const [isZoomed, setIsZoomed] = React.useState(false);
+  const [isZoomed, setIsZoomed] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   if (!image) {
     return <div className="product-image" />;
   }
+
+  // Generate Cloudinary optimized URLs
+  const imageUrl = image.url;
+  const imageSrc = getOptimizedImageUrl(imageUrl, IMAGE_SIZES.preview);
+  const imageSrcSet = getSrcSet(imageUrl, [400, 600, 800, 1200]);
+  const imageSizes = getSizes({
+    '(max-width: 640px)': '100vw',
+    '(max-width: 1024px)': '50vw',
+    default: '50vw',
+  });
+  // Full resolution for lightbox
+  const lightboxUrl = getOptimizedImageUrl(imageUrl, IMAGE_SIZES.full);
 
   return (
     <>
@@ -143,12 +161,18 @@ function ProductImage({image}: {image: ProductVariantFragment['image']}) {
             <path d="M8 11h6"></path>
           </svg>
         </button>
-        <Image
+        <img
+          src={imageSrc}
+          srcSet={imageSrcSet}
+          sizes={imageSizes}
           alt={image.altText || 'Product Image'}
-          aspectRatio="1/1"
-          data={image}
-          key={image.id}
-          sizes="(min-width: 45em) 50vw, 100vw"
+          loading="eager"
+          fetchPriority="high"
+          width={800}
+          height={800}
+          onLoad={() => setIsLoaded(true)}
+          className={`product-main-image ${isLoaded ? 'loaded' : ''}`}
+          style={{aspectRatio: '1/1', objectFit: 'cover', width: '100%'}}
         />
         <div className="product-image-pagination">
           <button className="pagination-arrow" disabled aria-label="Previous image">
@@ -185,7 +209,7 @@ function ProductImage({image}: {image: ProductVariantFragment['image']}) {
           </button>
           <div className="product-lightbox-content" onClick={(e) => e.stopPropagation()}>
             <img
-              src={image.url}
+              src={lightboxUrl}
               alt={image.altText || 'Product Image'}
               className="product-lightbox-image"
             />
