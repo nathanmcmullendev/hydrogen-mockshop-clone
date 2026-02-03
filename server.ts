@@ -25,17 +25,36 @@ export default {
     executionContext: ExecutionContext,
   ): Promise<Response> {
     try {
+      // Merge process.env into env for Vercel compatibility
+      // Vercel Edge passes env vars via process.env, not worker env parameter
+      const mergedEnv: Env = {
+        ...env,
+        SESSION_SECRET: env.SESSION_SECRET || (process.env as any).SESSION_SECRET,
+        PUBLIC_STORE_DOMAIN: env.PUBLIC_STORE_DOMAIN || (process.env as any).PUBLIC_STORE_DOMAIN,
+        PUBLIC_STOREFRONT_API_TOKEN: env.PUBLIC_STOREFRONT_API_TOKEN || (process.env as any).PUBLIC_STOREFRONT_API_TOKEN,
+        PRIVATE_STOREFRONT_API_TOKEN: env.PRIVATE_STOREFRONT_API_TOKEN || (process.env as any).PRIVATE_STOREFRONT_API_TOKEN,
+        PUBLIC_STOREFRONT_ID: env.PUBLIC_STOREFRONT_ID || (process.env as any).PUBLIC_STOREFRONT_ID,
+        // Stripe checkout
+        STRIPE_SECRET_KEY: env.STRIPE_SECRET_KEY || (process.env as any).STRIPE_SECRET_KEY,
+        VITE_STRIPE_PUBLIC_KEY: env.VITE_STRIPE_PUBLIC_KEY || (process.env as any).VITE_STRIPE_PUBLIC_KEY,
+        // Shopify Admin
+        SHOPIFY_ADMIN_ACCESS_TOKEN: env.SHOPIFY_ADMIN_ACCESS_TOKEN || (process.env as any).SHOPIFY_ADMIN_ACCESS_TOKEN,
+        SHOPIFY_ADMIN_STORE_DOMAIN: env.SHOPIFY_ADMIN_STORE_DOMAIN || (process.env as any).SHOPIFY_ADMIN_STORE_DOMAIN,
+        // Cloudinary
+        VITE_CLOUDINARY_CLOUD: env.VITE_CLOUDINARY_CLOUD || (process.env as any).VITE_CLOUDINARY_CLOUD,
+      };
+
       /**
        * Open a cache instance in the worker and a custom session instance.
        */
-      if (!env?.SESSION_SECRET) {
+      if (!mergedEnv?.SESSION_SECRET) {
         throw new Error('SESSION_SECRET environment variable is not set');
       }
 
       const waitUntil = (p: Promise<any>) => executionContext.waitUntil(p);
       const [cache, session] = await Promise.all([
         caches.open('hydrogen'),
-        HydrogenSession.init(request, [env.SESSION_SECRET]),
+        HydrogenSession.init(request, [mergedEnv.SESSION_SECRET]),
       ]);
 
       /**
@@ -45,10 +64,10 @@ export default {
         cache,
         waitUntil,
         i18n: {language: 'EN', country: 'US'},
-        publicStorefrontToken: env.PUBLIC_STOREFRONT_API_TOKEN,
-        privateStorefrontToken: env.PRIVATE_STOREFRONT_API_TOKEN,
-        storeDomain: env.PUBLIC_STORE_DOMAIN,
-        storefrontId: env.PUBLIC_STOREFRONT_ID,
+        publicStorefrontToken: mergedEnv.PUBLIC_STOREFRONT_API_TOKEN,
+        privateStorefrontToken: mergedEnv.PRIVATE_STOREFRONT_API_TOKEN,
+        storeDomain: mergedEnv.PUBLIC_STORE_DOMAIN,
+        storefrontId: mergedEnv.PUBLIC_STOREFRONT_ID,
         storefrontHeaders: getStorefrontHeaders(request),
       });
 
@@ -70,7 +89,7 @@ export default {
       const handleRequest = createRequestHandler({
         build: remixBuild,
         mode: process.env.NODE_ENV,
-        getLoadContext: () => ({session, storefront, env, cart}),
+        getLoadContext: () => ({session, storefront, env: mergedEnv, cart}),
       });
 
       const response = await handleRequest(request);
