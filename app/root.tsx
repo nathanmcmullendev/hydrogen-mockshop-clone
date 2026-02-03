@@ -50,6 +50,9 @@ export async function loader({context}: LoaderArgs) {
   const customerAccessToken = await session.get('customerAccessToken');
   const publicStoreDomain = context.env.PUBLIC_STORE_DOMAIN;
 
+  // Cloudinary cloud name for image optimization
+  const cloudinaryCloud = context.env.VITE_CLOUDINARY_CLOUD || '';
+
   // validate the customer access token is valid
   const {isLoggedIn, headers} = await validateCustomerAccessToken(
     customerAccessToken,
@@ -82,6 +85,9 @@ export async function loader({context}: LoaderArgs) {
       header: await headerPromise,
       isLoggedIn,
       publicStoreDomain,
+      ENV: {
+        VITE_CLOUDINARY_CLOUD: cloudinaryCloud,
+      },
     },
     {headers},
   );
@@ -99,6 +105,12 @@ export default function App() {
         <Links />
       </head>
       <body>
+        {/* Expose environment variables to client */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.ENV = ${JSON.stringify(data.ENV || {})}`,
+          }}
+        />
         <Layout {...data}>
           <Outlet />
         </Layout>

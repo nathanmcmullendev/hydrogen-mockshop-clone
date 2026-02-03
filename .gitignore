@@ -8,3 +8,10 @@ node_modules
 .shopify
 .vercel
 .env*.local
+
+# Scripts with API tokens (local development only)
+/scripts/
+
+# Temp directories
+/hydrogen-2026-temp/
+nul
