@@ -18,10 +18,17 @@ export interface ImageOptions {
  * Returns undefined if not configured (will fall back to Shopify CDN)
  */
 export function getCloudinaryCloud(): string | undefined {
-  // Vite automatically exposes VITE_* env vars via import.meta.env
-  // This is replaced at build time, so it works on both server and client
-  // without hydration issues
-  return import.meta.env.VITE_CLOUDINARY_CLOUD || undefined;
+  // Vite replaces import.meta.env at BUILD TIME for client bundles
+  // However, in edge runtimes (Vercel Edge/Cloudflare Workers), import.meta.env
+  // may be undefined, so we need defensive checks
+  try {
+    if (typeof import.meta !== 'undefined' && import.meta.env) {
+      return import.meta.env.VITE_CLOUDINARY_CLOUD || undefined;
+    }
+  } catch {
+    // Edge runtime - import.meta.env not available
+  }
+  return undefined;
 }
 
 /**
