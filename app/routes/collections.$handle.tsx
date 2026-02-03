@@ -5,13 +5,13 @@ import {useLoaderData, Link, useSearchParams, useSubmit} from '@remix-run/react'
 import {
   Pagination,
   getPaginationVariables,
+  Image,
   Money,
 } from '@shopify/hydrogen';
 import type {ProductItemFragment} from 'storefrontapi.generated';
 import {useVariantUrl} from '~/utils';
 import {WishlistButton} from '~/components/Wishlist';
 import {ProductQuickView, QuickViewButton} from '~/components/ProductQuickView';
-import {OptimizedImage} from '~/components/OptimizedImage';
 
 /**
  * LEARNING: Reusing Sort Pattern from Search
@@ -233,11 +233,10 @@ function ProductItem({
           to={variantUrl}
         >
           {product.featuredImage && (
-            <OptimizedImage
-              data={product.featuredImage}
+            <Image
               alt={product.featuredImage.altText || product.title}
               aspectRatio="1/1"
-              width={400}
+              data={product.featuredImage}
               loading={loading}
               sizes="(min-width: 45em) 400px, 100vw"
             />
