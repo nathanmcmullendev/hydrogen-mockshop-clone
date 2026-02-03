@@ -1,3 +1,4 @@
+import {useState} from 'react';
 import type {V2_MetaFunction} from '@shopify/remix-oxygen';
 import {json, redirect, type LoaderArgs} from '@shopify/remix-oxygen';
 import {useLoaderData, Link, useSearchParams, useSubmit} from '@remix-run/react';
@@ -9,6 +10,8 @@ import {
 } from '@shopify/hydrogen';
 import type {ProductItemFragment} from 'storefrontapi.generated';
 import {useVariantUrl} from '~/utils';
+import {WishlistButton} from '~/components/Wishlist';
+import {ProductQuickView, QuickViewButton} from '~/components/ProductQuickView';
 
 /**
  * LEARNING: Reusing Sort Pattern from Search
@@ -101,6 +104,7 @@ export default function Collection() {
   const {collection, sortParam} = useLoaderData<typeof loader>();
   const [searchParams] = useSearchParams();
   const submit = useSubmit();
+  const [quickViewHandle, setQuickViewHandle] = useState<string | null>(null);
 
   /**
    * LEARNING: Sort Change Handler
@@ -168,18 +172,30 @@ export default function Collection() {
             <PreviousLink className="pagination-link">
               {isLoading ? 'Loading...' : <span>Load previous</span>}
             </PreviousLink>
-            <ProductsGrid products={nodes} />
+            <ProductsGrid products={nodes} onQuickView={setQuickViewHandle} />
             <NextLink className="pagination-link load-more">
               {isLoading ? 'Loading...' : <span>Load more</span>}
             </NextLink>
           </>
         )}
       </Pagination>
+
+      <ProductQuickView
+        isOpen={!!quickViewHandle}
+        onClose={() => setQuickViewHandle(null)}
+        productHandle={quickViewHandle}
+      />
     </div>
   );
 }
 
-function ProductsGrid({products}: {products: ProductItemFragment[]}) {
+function ProductsGrid({
+  products,
+  onQuickView,
+}: {
+  products: ProductItemFragment[];
+  onQuickView: (handle: string) => void;
+}) {
   return (
     <div className="products-grid">
       {products.map((product, index) => {
@@ -188,6 +204,7 @@ function ProductsGrid({products}: {products: ProductItemFragment[]}) {
             key={product.id}
             product={product}
             loading={index < 8 ? 'eager' : undefined}
+            onQuickView={onQuickView}
           />
         );
       })}
@@ -198,33 +215,54 @@ function ProductsGrid({products}: {products: ProductItemFragment[]}) {
 function ProductItem({
   product,
   loading,
+  onQuickView,
 }: {
   product: ProductItemFragment;
   loading?: 'eager' | 'lazy';
+  onQuickView: (handle: string) => void;
 }) {
   const variant = product.variants.nodes[0];
   const variantUrl = useVariantUrl(product.handle, variant.selectedOptions);
   return (
-    <Link
-      className="product-item"
-      key={product.id}
-      prefetch="intent"
-      to={variantUrl}
-    >
-      {product.featuredImage && (
-        <Image
-          alt={product.featuredImage.altText || product.title}
-          aspectRatio="1/1"
-          data={product.featuredImage}
-          loading={loading}
-          sizes="(min-width: 45em) 400px, 100vw"
+    <div className="product-item-wrapper">
+      <div className="product-item-image-container">
+        <Link
+          className="product-item"
+          key={product.id}
+          prefetch="intent"
+          to={variantUrl}
+        >
+          {product.featuredImage && (
+            <Image
+              alt={product.featuredImage.altText || product.title}
+              aspectRatio="1/1"
+              data={product.featuredImage}
+              loading={loading}
+              sizes="(min-width: 45em) 400px, 100vw"
+            />
+          )}
+        </Link>
+        <WishlistButton
+          product={{
+            id: product.id,
+            handle: product.handle,
+            title: product.title,
+            price: product.priceRange.minVariantPrice,
+            image: product.featuredImage,
+          }}
         />
-      )}
-      <h4>{product.title}</h4>
-      <small>
-        <Money data={product.priceRange.minVariantPrice} />
-      </small>
-    </Link>
+        <QuickViewButton
+          productHandle={product.handle}
+          onQuickView={onQuickView}
+        />
+      </div>
+      <Link to={variantUrl} className="product-item-info">
+        <h4>{product.title}</h4>
+        <small>
+          <Money data={product.priceRange.minVariantPrice} />
+        </small>
+      </Link>
+    </div>
   );
 }
 
