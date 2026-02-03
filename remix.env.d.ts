@@ -23,6 +23,13 @@ declare global {
     PRIVATE_STOREFRONT_API_TOKEN: string;
     PUBLIC_STORE_DOMAIN: string;
     PUBLIC_STOREFRONT_ID: string;
+    // Stripe checkout
+    STRIPE_SECRET_KEY?: string;
+    VITE_STRIPE_PUBLIC_KEY?: string;
+    // Shopify Admin API for order creation
+    SHOPIFY_ADMIN_ACCESS_TOKEN?: string;
+    // Image optimization
+    VITE_CLOUDINARY_CLOUD?: string;
   }
 }
 

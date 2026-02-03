@@ -31,6 +31,16 @@ export function links() {
       rel: 'preconnect',
       href: 'https://shop.app',
     },
+    // Cloudinary CDN for image optimization (if configured)
+    {
+      rel: 'preconnect',
+      href: 'https://res.cloudinary.com',
+    },
+    // Stripe for checkout
+    {
+      rel: 'preconnect',
+      href: 'https://js.stripe.com',
+    },
     {rel: 'icon', type: 'image/svg+xml', href: favicon},
   ];
 }

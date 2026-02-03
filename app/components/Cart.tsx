@@ -1,6 +1,6 @@
 import {CartForm, Image, Money} from '@shopify/hydrogen';
 import type {CartLineUpdateInput} from '@shopify/hydrogen/storefront-api-types';
-import {Link} from '@remix-run/react';
+import {Link, useFetcher} from '@remix-run/react';
 import type {CartApiQueryFragment} from 'storefrontapi.generated';
 import {useVariantUrl} from '~/utils';
 
@@ -122,9 +122,9 @@ function CartCheckoutActions({checkoutUrl}: {checkoutUrl: string}) {
 
   return (
     <div className="cart-checkout-actions">
-      <a href={checkoutUrl} target="_self" className="cart-checkout-button">
+      <Link to="/checkout" className="cart-checkout-button">
         Continue to Checkout
-      </a>
+      </Link>
     </div>
   );
 }
@@ -180,31 +180,65 @@ function CartLineQuantity({line}: {line: CartLine}) {
   return (
     <div className="cart-line-quantity">
       <div className="cart-quantity-controls">
-        <CartLineUpdateButton lines={[{id: lineId, quantity: prevQuantity}]}>
-          <button
-            aria-label="Decrease quantity"
-            disabled={quantity <= 1}
-            name="decrease-quantity"
-            value={prevQuantity}
-            className="cart-quantity-btn"
-          >
-            −
-          </button>
-        </CartLineUpdateButton>
+        <OptimisticQuantityButton
+          lineId={lineId}
+          quantity={prevQuantity}
+          currentQuantity={quantity}
+          direction="decrease"
+        />
         <span className="cart-quantity-value">{quantity}</span>
-        <CartLineUpdateButton lines={[{id: lineId, quantity: nextQuantity}]}>
-          <button
-            aria-label="Increase quantity"
-            name="increase-quantity"
-            value={nextQuantity}
-            className="cart-quantity-btn"
-          >
-            +
-          </button>
-        </CartLineUpdateButton>
+        <OptimisticQuantityButton
+          lineId={lineId}
+          quantity={nextQuantity}
+          currentQuantity={quantity}
+          direction="increase"
+        />
       </div>
       <CartLineRemoveButton lineIds={[lineId]} />
     </div>
+  );
+}
+
+/**
+ * Optimistic quantity button that shows immediate feedback
+ */
+function OptimisticQuantityButton({
+  lineId,
+  quantity,
+  currentQuantity,
+  direction,
+}: {
+  lineId: string;
+  quantity: number;
+  currentQuantity: number;
+  direction: 'increase' | 'decrease';
+}) {
+  const fetcher = useFetcher();
+  const isLoading = fetcher.state !== 'idle';
+
+  // Get optimistic quantity from form data if this form is submitting
+  const optimisticQuantity = fetcher.formData
+    ? Number(fetcher.formData.get('quantity') || currentQuantity)
+    : currentQuantity;
+
+  return (
+    <CartForm
+      route="/cart"
+      action={CartForm.ACTIONS.LinesUpdate}
+      inputs={{lines: [{id: lineId, quantity}]}}
+    >
+      <input type="hidden" name="quantity" value={quantity} />
+      <button
+        type="submit"
+        aria-label={direction === 'increase' ? 'Increase quantity' : 'Decrease quantity'}
+        disabled={direction === 'decrease' && currentQuantity <= 1}
+        name={`${direction}-quantity`}
+        value={quantity}
+        className={`cart-quantity-btn ${isLoading ? 'loading' : ''}`}
+      >
+        {direction === 'decrease' ? '−' : '+'}
+      </button>
+    </CartForm>
   );
 }
 
@@ -322,20 +356,3 @@ function UpdateDiscountForm({
   );
 }
 
-function CartLineUpdateButton({
-  children,
-  lines,
-}: {
-  children: React.ReactNode;
-  lines: CartLineUpdateInput[];
-}) {
-  return (
-    <CartForm
-      route="/cart"
-      action={CartForm.ACTIONS.LinesUpdate}
-      inputs={{lines}}
-    >
-      {children}
-    </CartForm>
-  );
-}
