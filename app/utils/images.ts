@@ -1,39 +1,63 @@
 /**
  * Image optimization utilities
  * Provides Cloudinary CDN integration with fallback to Shopify CDN
+ *
+ * CDN Benefits:
+ * - Global edge caching (200+ PoPs)
+ * - Automatic WebP/AVIF format conversion
+ * - Quality optimization
+ * - ~70% smaller file sizes
  */
+
+/**
+ * Cloudinary cloud name - set at BUILD TIME by Vite
+ * This gets baked into the client bundle, so it works in browser
+ * On server/edge, this may be empty string (falls back to Shopify CDN)
+ */
+const CLOUDINARY_CLOUD = (() => {
+  try {
+    // Vite replaces this at build time for client bundles
+    return import.meta.env?.VITE_CLOUDINARY_CLOUD || '';
+  } catch {
+    return '';
+  }
+})();
 
 export interface ImageOptions {
   width?: number;
   height?: number;
-  quality?: number;
+  /** Quality: number (1-100) or Cloudinary preset ('auto', 'auto:good', 'auto:best') */
+  quality?: number | string;
   format?: 'auto' | 'webp' | 'avif' | 'jpg' | 'png';
-  crop?: 'fill' | 'fit' | 'scale' | 'pad';
+  crop?: 'fill' | 'fit' | 'scale' | 'pad' | 'limit';
   gravity?: 'auto' | 'face' | 'center';
 }
 
 /**
- * Get the Cloudinary cloud name from environment
- * Uses Vite's import.meta.env which is statically replaced at build time
- * Returns undefined if not configured (will fall back to Shopify CDN)
+ * Image size presets optimized for display sizes
  */
-export function getCloudinaryCloud(): string | undefined {
-  // Vite replaces import.meta.env at BUILD TIME for client bundles
-  // However, in edge runtimes (Vercel Edge/Cloudflare Workers), import.meta.env
-  // may be undefined, so we need defensive checks
-  try {
-    if (typeof import.meta !== 'undefined' && import.meta.env) {
-      return import.meta.env.VITE_CLOUDINARY_CLOUD || undefined;
-    }
-  } catch {
-    // Edge runtime - import.meta.env not available
-  }
-  return undefined;
+export const IMAGE_SIZES = {
+  blur: 20,        // Tiny placeholder for blur-up effect (~1KB)
+  thumbnail: 400,  // Product grid cards (~15-30KB)
+  preview: 800,    // Product page, hero sections (~40-80KB)
+  full: 1200,      // Lightbox / high-res (~100-200KB)
+};
+
+/**
+ * Get the Cloudinary cloud name
+ */
+export function getCloudinaryCloud(): string {
+  return CLOUDINARY_CLOUD;
 }
 
 /**
  * Transform a Shopify CDN URL to use Cloudinary's fetch feature
  * Falls back to Shopify's built-in transforms if Cloudinary is not configured
+ *
+ * Cloudinary transforms:
+ * - f_auto: Automatic format (WebP/AVIF when supported)
+ * - q_auto:good: Better compression with minimal quality loss (~30-40% smaller)
+ * - c_limit: Don't upscale, only downscale
  */
 export function getOptimizedImageUrl(
   url: string | undefined | null,
@@ -44,10 +68,9 @@ export function getOptimizedImageUrl(
   const {
     width,
     height,
-    quality = 80,
+    quality = 'auto:good', // Use Cloudinary's smart quality
     format = 'auto',
-    crop = 'fill',
-    gravity = 'auto',
+    crop = 'limit', // Don't upscale images
   } = options;
 
   const cloudinaryCloud = getCloudinaryCloud();
@@ -58,12 +81,9 @@ export function getOptimizedImageUrl(
 
     if (width) transformations.push(`w_${width}`);
     if (height) transformations.push(`h_${height}`);
+    transformations.push(`c_${crop}`);
     transformations.push(`q_${quality}`);
     transformations.push(`f_${format}`);
-    if (width || height) {
-      transformations.push(`c_${crop}`);
-      transformations.push(`g_${gravity}`);
-    }
 
     const transform = transformations.join(',');
     return `https://res.cloudinary.com/${cloudinaryCloud}/image/fetch/${transform}/${encodeURIComponent(url)}`;
