@@ -960,6 +960,98 @@ main {
   }
 }
 
+/* Product Item with Wishlist & QuickView */
+.product-item-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.product-item-image-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #f5f5f5;
+}
+
+.product-item-image-container .product-item {
+  display: block;
+}
+
+.product-item-image-container img {
+  transition: transform 0.3s ease;
+}
+
+.product-item-image-container:hover img {
+  transform: scale(1.03);
+}
+
+.product-item-image-container .wishlist-button {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.2s ease;
+}
+
+.product-item-image-container:hover .wishlist-button {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.product-item-image-container .wishlist-button.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.product-item-image-container .quickview-trigger {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  opacity: 0;
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.product-item-image-container:hover .quickview-trigger {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.product-item-image-container .quickview-trigger:hover {
+  background: #000;
+  color: #fff;
+}
+
+.product-item-info {
+  display: block;
+  padding: 12px 0;
+  text-decoration: none;
+  color: inherit;
+}
+
+.product-item-info h4 {
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.product-item-info small {
+  color: #666;
+  font-size: 14px;
+}
+
 .product-item {
   display: block;
 }

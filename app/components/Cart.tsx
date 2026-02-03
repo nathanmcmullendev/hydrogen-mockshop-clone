@@ -120,9 +120,18 @@ function CartLineItem({
 function CartCheckoutActions({checkoutUrl}: {checkoutUrl: string}) {
   if (!checkoutUrl) return null;
 
+  const handleCheckout = () => {
+    // Close the cart drawer by removing hash
+    window.location.hash = '';
+  };
+
   return (
     <div className="cart-checkout-actions">
-      <Link to="/checkout" className="cart-checkout-button">
+      <Link
+        to="/checkout"
+        className="cart-checkout-button"
+        onClick={handleCheckout}
+      >
         Continue to Checkout
       </Link>
     </div>
