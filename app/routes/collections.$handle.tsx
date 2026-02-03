@@ -11,7 +11,12 @@ import type {ProductItemFragment} from 'storefrontapi.generated';
 import {useVariantUrl} from '~/utils';
 import {WishlistButton} from '~/components/Wishlist';
 import {ProductQuickView, QuickViewButton} from '~/components/ProductQuickView';
-import {OptimizedImage} from '~/components/OptimizedImage';
+import {
+  getOptimizedImageUrl,
+  getSrcSet,
+  getSizes,
+  IMAGE_SIZES,
+} from '~/utils/images';
 
 /**
  * LEARNING: Reusing Sort Pattern from Search
@@ -199,11 +204,13 @@ function ProductsGrid({
   return (
     <div className="products-grid">
       {products.map((product, index) => {
+        // First 4 products are priority (above the fold)
+        const priority = index < 4;
         return (
           <ProductItem
             key={product.id}
             product={product}
-            loading={index < 8 ? 'eager' : undefined}
+            priority={priority}
             onQuickView={onQuickView}
           />
         );
@@ -212,17 +219,42 @@ function ProductsGrid({
   );
 }
 
+/**
+ * ProductItem - Optimized product card with Cloudinary images
+ *
+ * Features:
+ * - Native <img> with srcset for responsive loading
+ * - Priority loading for above-fold images
+ * - fetchpriority hint for browser scheduling
+ * - Image reveal animation
+ */
 function ProductItem({
   product,
-  loading,
+  priority = false,
   onQuickView,
 }: {
   product: ProductItemFragment;
-  loading?: 'eager' | 'lazy';
+  priority?: boolean;
   onQuickView: (handle: string) => void;
 }) {
+  const [isLoaded, setIsLoaded] = useState(false);
   const variant = product.variants.nodes[0];
   const variantUrl = useVariantUrl(product.handle, variant.selectedOptions);
+
+  // Generate optimized image URLs
+  const imageUrl = product.featuredImage?.url;
+  const imageSrc = imageUrl
+    ? getOptimizedImageUrl(imageUrl, IMAGE_SIZES.thumbnail)
+    : '';
+  const imageSrcSet = imageUrl
+    ? getSrcSet(imageUrl, [200, 400, 600, 800])
+    : '';
+  const imageSizes = getSizes({
+    '(max-width: 640px)': '50vw',
+    '(max-width: 1024px)': '33vw',
+    default: '25vw',
+  });
+
   return (
     <div className="product-item-wrapper">
       <div className="product-item-image-container">
@@ -232,15 +264,22 @@ function ProductItem({
           prefetch="intent"
           to={variantUrl}
         >
-          {product.featuredImage && (
-            <OptimizedImage
-              data={product.featuredImage}
-              alt={product.featuredImage.altText || product.title}
-              aspectRatio="1/1"
+          {imageUrl ? (
+            <img
+              src={imageSrc}
+              srcSet={imageSrcSet}
+              sizes={imageSizes}
+              alt={product.featuredImage?.altText || product.title}
+              loading={priority ? 'eager' : 'lazy'}
+              fetchPriority={priority ? 'high' : 'auto'}
               width={400}
-              loading={loading}
-              sizes="(min-width: 45em) 400px, 100vw"
+              height={400}
+              onLoad={() => setIsLoaded(true)}
+              className={`product-image ${isLoaded ? 'loaded' : ''}`}
+              style={{aspectRatio: '1/1', objectFit: 'cover'}}
             />
+          ) : (
+            <div className="product-image-placeholder" />
           )}
         </Link>
         <WishlistButton

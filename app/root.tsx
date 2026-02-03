@@ -23,18 +23,20 @@ export function links() {
     {rel: 'stylesheet', href: tailwindCss},
     {rel: 'stylesheet', href: resetStyles},
     {rel: 'stylesheet', href: appStyles},
+    // Preconnect to CDNs for faster image loading
+    {
+      rel: 'preconnect',
+      href: 'https://res.cloudinary.com',
+      crossOrigin: 'anonymous' as const,
+    },
     {
       rel: 'preconnect',
       href: 'https://cdn.shopify.com',
+      crossOrigin: 'anonymous' as const,
     },
     {
       rel: 'preconnect',
       href: 'https://shop.app',
-    },
-    // Cloudinary CDN for image optimization (if configured)
-    {
-      rel: 'preconnect',
-      href: 'https://res.cloudinary.com',
     },
     // Stripe for checkout
     {

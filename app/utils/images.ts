@@ -1,6 +1,8 @@
 /**
  * Image optimization utilities
- * Provides Cloudinary CDN integration with fallback to Shopify CDN
+ * Provides Cloudinary CDN integration for lightning-fast image delivery
+ *
+ * Based on ecommerce-react-shopify implementation pattern.
  *
  * CDN Benefits:
  * - Global edge caching (200+ PoPs)
@@ -14,23 +16,12 @@
  *
  * NOTE: Hardcoded because import.meta.env doesn't work reliably in Hydrogen's
  * edge runtime. This matches the VITE_CLOUDINARY_CLOUD value in Vercel.
- *
- * To change: Update this value and VITE_CLOUDINARY_CLOUD in Vercel together.
  */
 const CLOUDINARY_CLOUD = 'dh4qwuvuo';
 
-export interface ImageOptions {
-  width?: number;
-  height?: number;
-  /** Quality: number (1-100) or Cloudinary preset ('auto', 'auto:good', 'auto:best') */
-  quality?: number | string;
-  format?: 'auto' | 'webp' | 'avif' | 'jpg' | 'png';
-  crop?: 'fill' | 'fit' | 'scale' | 'pad' | 'limit';
-  gravity?: 'auto' | 'face' | 'center';
-}
-
 /**
- * Image size presets optimized for display sizes
+ * Image size presets (in pixels)
+ * Optimized based on actual display sizes to minimize bandwidth
  */
 export const IMAGE_SIZES = {
   blur: 20,        // Tiny placeholder for blur-up effect (~1KB)
@@ -39,103 +30,120 @@ export const IMAGE_SIZES = {
   full: 1200,      // Lightbox / high-res (~100-200KB)
 };
 
-/**
- * Get the Cloudinary cloud name
- */
-export function getCloudinaryCloud(): string {
-  return CLOUDINARY_CLOUD;
+export interface ImageOptions {
+  quality?: string;
+  format?: string;
+  crop?: string;
 }
 
 /**
- * Transform a Shopify CDN URL to use Cloudinary's fetch feature
- * Falls back to Shopify's built-in transforms if Cloudinary is not configured
+ * Generate optimized image URL via Cloudinary fetch
  *
- * Cloudinary transforms:
- * - f_auto: Automatic format (WebP/AVIF when supported)
- * - q_auto:good: Better compression with minimal quality loss (~30-40% smaller)
+ * Transforms applied:
+ * - w_{size}: Width constraint
  * - c_limit: Don't upscale, only downscale
+ * - q_auto:good: Automatic quality (~30-40% smaller than q_auto)
+ * - f_auto: Automatic format (WebP/AVIF when supported)
+ *
+ * @param url - Original image URL (Shopify CDN)
+ * @param maxSize - Maximum dimension in pixels
+ * @param options - Additional Cloudinary options
  */
 export function getOptimizedImageUrl(
   url: string | undefined | null,
+  maxSize: number = IMAGE_SIZES.thumbnail,
   options: ImageOptions = {},
 ): string {
   if (!url) return '';
 
   const {
-    width,
-    height,
-    quality = 'auto:good', // Use Cloudinary's smart quality
+    quality = 'auto:good',
     format = 'auto',
-    crop = 'limit', // Don't upscale images
+    crop = 'limit',
   } = options;
 
-  const cloudinaryCloud = getCloudinaryCloud();
+  // Build Cloudinary transform chain
+  const transforms = [
+    `w_${maxSize}`,
+    `c_${crop}`,
+    `q_${quality}`,
+    `f_${format}`,
+  ].join(',');
 
-  // If Cloudinary is configured, use fetch delivery
-  if (cloudinaryCloud) {
-    const transformations: string[] = [];
-
-    if (width) transformations.push(`w_${width}`);
-    if (height) transformations.push(`h_${height}`);
-    transformations.push(`c_${crop}`);
-    transformations.push(`q_${quality}`);
-    transformations.push(`f_${format}`);
-
-    const transform = transformations.join(',');
-    return `https://res.cloudinary.com/${cloudinaryCloud}/image/fetch/${transform}/${encodeURIComponent(url)}`;
-  }
-
-  // Fallback to Shopify CDN transforms
-  return getShopifyOptimizedUrl(url, options);
+  // Cloudinary fetch URL format
+  const encodedUrl = encodeURIComponent(url);
+  return `https://res.cloudinary.com/${CLOUDINARY_CLOUD}/image/fetch/${transforms}/${encodedUrl}`;
 }
 
 /**
- * Use Shopify's built-in image CDN transforms
- * https://shopify.dev/docs/api/storefront/current/objects/Image
+ * Generate srcset for responsive images
+ * Returns multiple sizes for browser to choose from
+ *
+ * @param url - Original image URL
+ * @param widths - Array of widths to generate
+ * @param options - Cloudinary options
  */
-export function getShopifyOptimizedUrl(
-  url: string,
+export function getSrcSet(
+  url: string | undefined | null,
+  widths: number[] = [400, 800, 1200, 1600],
   options: ImageOptions = {},
 ): string {
   if (!url) return '';
 
-  const {width, height} = options;
-
-  // Shopify CDN URLs support width/height transforms via URL params
-  // Example: image.jpg?width=800&height=600
-  const urlObj = new URL(url);
-
-  if (width) urlObj.searchParams.set('width', String(width));
-  if (height) urlObj.searchParams.set('height', String(height));
-
-  return urlObj.toString();
-}
-
-/**
- * Generate responsive srcset for an image
- */
-export function generateSrcSet(
-  url: string | undefined | null,
-  widths: number[] = [320, 640, 960, 1280, 1600],
-  options: Omit<ImageOptions, 'width'> = {},
-): string {
-  if (!url) return '';
-
   return widths
-    .map((w) => {
-      const optimizedUrl = getOptimizedImageUrl(url, {...options, width: w});
-      return `${optimizedUrl} ${w}w`;
-    })
+    .map((w) => `${getOptimizedImageUrl(url, w, options)} ${w}w`)
     .join(', ');
 }
 
 /**
- * Generate a low-quality image placeholder (LQIP) URL
+ * Generate sizes attribute for responsive images
+ * Tells browser which size to use at each breakpoint
+ *
+ * @param breakpoints - Object mapping breakpoints to sizes
+ */
+export function getSizes(breakpoints: Record<string, string> = {}): string {
+  const defaults: Record<string, string> = {
+    '(max-width: 640px)': '100vw',
+    '(max-width: 1024px)': '50vw',
+    'default': '400px',
+  };
+
+  const merged = {...defaults, ...breakpoints};
+
+  return Object.entries(merged)
+    .map(([breakpoint, size]) =>
+      breakpoint === 'default' ? size : `${breakpoint} ${size}`,
+    )
+    .join(', ');
+}
+
+/**
+ * Get Low Quality Image Placeholder (LQIP)
+ * Returns tiny blurred version for instant display
  */
 export function getLqipUrl(url: string | undefined | null): string {
-  return getOptimizedImageUrl(url, {
-    width: 20,
-    quality: 30,
-    format: 'jpg',
+  return getOptimizedImageUrl(url, IMAGE_SIZES.blur, {quality: 'auto:low'});
+}
+
+/**
+ * Preload an image in the background
+ */
+export function preloadImage(url: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = url;
   });
 }
+
+/**
+ * Preload multiple images
+ */
+export function preloadImages(urls: string[]): Promise<HTMLImageElement[]> {
+  return Promise.all(urls.map(preloadImage));
+}
+
+// Re-export for backwards compatibility
+export const getCloudinaryCloud = () => CLOUDINARY_CLOUD;
+export const generateSrcSet = getSrcSet;
