@@ -4,11 +4,17 @@ This document explains how Cloudinary CDN integration works in this Hydrogen sto
 
 ## Current Status
 
-**Status: Utilities Available, Manual Integration Required**
+**Status: Infrastructure Ready, Using Shopify CDN (Fallback)**
 
-The Cloudinary utilities (`app/utils/images.ts`) and component (`app/components/OptimizedImage.tsx`) are available but NOT automatically used by the product grid. The store currently uses Shopify's built-in CDN via Hydrogen's `<Image>` component.
+The Cloudinary utilities and component are integrated but currently fall back to Shopify's CDN because `import.meta.env` is not available in Vercel's edge runtime at request time.
 
-**Why?** Direct integration caused server-side rendering issues with `import.meta.env` in Hydrogen's edge runtime. The utilities work for manual/selective use.
+**Current Behavior:**
+- Product grid uses `OptimizedImage` component
+- On server (edge), `getCloudinaryCloud()` safely returns `undefined`
+- Component falls back to Hydrogen's `<Image>` (Shopify CDN)
+- Site works without errors, images load fast
+
+**To fully enable Cloudinary**, the cloud name needs to be passed from the loader via React context (see "Future Improvements" section).
 
 ## Overview
 
