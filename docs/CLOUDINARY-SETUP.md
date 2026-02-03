@@ -2,13 +2,21 @@
 
 This document explains how Cloudinary CDN integration works in this Hydrogen store.
 
+## Current Status
+
+**Status: Utilities Available, Manual Integration Required**
+
+The Cloudinary utilities (`app/utils/images.ts`) and component (`app/components/OptimizedImage.tsx`) are available but NOT automatically used by the product grid. The store currently uses Shopify's built-in CDN via Hydrogen's `<Image>` component.
+
+**Why?** Direct integration caused server-side rendering issues with `import.meta.env` in Hydrogen's edge runtime. The utilities work for manual/selective use.
+
 ## Overview
 
-The store uses **Cloudinary's Fetch delivery** for image optimization. This means:
+The store can use **Cloudinary's Fetch delivery** for image optimization:
 - Images are stored on Shopify's CDN (source of truth)
-- When `VITE_CLOUDINARY_CLOUD` is configured, images are served through Cloudinary
+- When `VITE_CLOUDINARY_CLOUD` is configured, images CAN be served through Cloudinary
 - Cloudinary fetches from Shopify, applies transforms, and caches at the edge
-- If Cloudinary is not configured, images fall back to Shopify's built-in CDN transforms
+- Currently, images use Shopify's built-in CDN (which is also fast and well-optimized)
 
 ## Architecture
 
@@ -120,12 +128,35 @@ https://res.cloudinary.com/YOUR_CLOUD/image/fetch/w_800,q_80,f_auto,c_fill,g_aut
 
 ## Usage Examples
 
-### Using the Utility Function
+### Current Approach (Shopify CDN - Recommended)
+
+The store currently uses Hydrogen's built-in `<Image>` component which uses Shopify's CDN:
+
+```tsx
+import { Image } from '@shopify/hydrogen';
+
+// Hydrogen's Image component - automatic optimization
+<Image
+  data={product.featuredImage}
+  aspectRatio="1/1"
+  sizes="(min-width: 45em) 400px, 100vw"
+/>
+```
+
+This provides:
+- Automatic responsive srcset generation
+- WebP/AVIF when browser supports
+- Proper aspect ratio handling
+- No additional configuration needed
+
+### Manual Cloudinary Usage (Optional)
+
+If you need Cloudinary-specific features (like face detection cropping), you can use the utilities directly:
 
 ```tsx
 import { getOptimizedImageUrl, generateSrcSet } from '~/utils/images';
 
-// Basic usage
+// Basic usage - generates Cloudinary URL if configured
 const optimizedUrl = getOptimizedImageUrl(product.image.url, {
   width: 800,
   quality: 85,
@@ -133,22 +164,24 @@ const optimizedUrl = getOptimizedImageUrl(product.image.url, {
 
 // With srcset for responsive images
 const srcSet = generateSrcSet(product.image.url, [320, 640, 960, 1280]);
+
+// Use in a native img tag
+<img
+  src={optimizedUrl}
+  srcSet={srcSet}
+  sizes="(min-width: 45em) 400px, 100vw"
+  alt={product.title}
+/>
 ```
 
-### Using the Component
+### OptimizedImage Component (Client-side Only)
+
+The `OptimizedImage` component is available but should be used carefully:
 
 ```tsx
 import { OptimizedImage } from '~/components/OptimizedImage';
 
-// With Shopify image data
-<OptimizedImage
-  data={product.featuredImage}
-  width={400}
-  aspectRatio="1/1"
-  showPlaceholder={true}
-/>
-
-// With direct URL
+// Works best with direct src (not Shopify data object)
 <OptimizedImage
   src="https://cdn.shopify.com/..."
   alt="Product"
@@ -156,6 +189,8 @@ import { OptimizedImage } from '~/components/OptimizedImage';
   imageOptions={{ quality: 90, format: 'webp' }}
 />
 ```
+
+**Note:** When passing Shopify image `data`, the component falls back to Hydrogen's Image component to avoid SSR issues.
 
 ## Verification
 
@@ -191,16 +226,23 @@ If `VITE_CLOUDINARY_CLOUD` is not set or empty:
 
 ### Images not using Cloudinary
 
-1. **Check env var is set:**
-   ```bash
-   vercel env ls | grep CLOUDINARY
-   ```
+Currently, the product grid uses Shopify CDN by default. This is intentional.
 
-2. **Rebuild after setting env var:**
-   Vite inlines env vars at build time. A new build is required.
+To verify Cloudinary is configured:
+```bash
+vercel env ls | grep CLOUDINARY
+```
 
-3. **Check for typos:**
-   The var must be exactly `VITE_CLOUDINARY_CLOUD`
+### Known Issue: SSR Compatibility
+
+**Problem:** Using `import.meta.env.VITE_CLOUDINARY_CLOUD` in the OptimizedImage component caused 500 errors when rendering on the server (Vercel Edge/Hydrogen runtime).
+
+**Current Workaround:** The store uses Hydrogen's built-in `<Image>` component which works reliably. Cloudinary utilities are available for manual/client-side use.
+
+**Future Fix Options:**
+1. Use Hydrogen's Image `loader` prop to customize URL generation
+2. Use React context to pass Cloudinary config from root loader
+3. Use client-only wrapper for OptimizedImage component
 
 ### Cloudinary returning errors
 
@@ -211,9 +253,9 @@ If `VITE_CLOUDINARY_CLOUD` is not set or empty:
 ### Hydration errors
 
 If you see React hydration errors related to images:
-- This implementation uses `import.meta.env` (build-time)
-- NOT `window.ENV` (runtime) which causes hydration mismatches
-- If you modified the code, ensure you're using `import.meta.env`
+- The store currently avoids this by using Hydrogen's Image component
+- `import.meta.env` can behave differently on server vs client in edge runtimes
+- If you need Cloudinary, consider client-only rendering with `useEffect`
 
 ## Cost Considerations
 
