@@ -39,6 +39,11 @@ export async function action({request, context}: ActionArgs) {
 
   const {env} = context;
 
+  // Debug logging
+  console.log('CREATE-ORDER: env keys:', Object.keys(env));
+  console.log('CREATE-ORDER: PUBLIC_STORE_DOMAIN:', env.PUBLIC_STORE_DOMAIN);
+  console.log('CREATE-ORDER: SHOPIFY_ADMIN_ACCESS_TOKEN exists:', !!env.SHOPIFY_ADMIN_ACCESS_TOKEN);
+
   // Check required configuration
   if (!env.STRIPE_SECRET_KEY) {
     return json({error: 'Stripe is not configured'}, {status: 500});
@@ -46,6 +51,10 @@ export async function action({request, context}: ActionArgs) {
 
   if (!env.SHOPIFY_ADMIN_ACCESS_TOKEN) {
     return json({error: 'Shopify Admin API is not configured'}, {status: 500});
+  }
+
+  if (!env.PUBLIC_STORE_DOMAIN) {
+    return json({error: 'Store domain is not configured'}, {status: 500});
   }
 
   try {
