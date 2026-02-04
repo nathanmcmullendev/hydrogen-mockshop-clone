@@ -1,30 +1,25 @@
 import {useLoaderData, Link} from '@remix-run/react';
 import {json, type LoaderArgs} from '@shopify/remix-oxygen';
 import {Image} from '@shopify/hydrogen';
-import type {CollectionFragment} from 'storefrontapi.generated';
 
-// Whitelist of relevant collection handles for the storefront
-// Filter out art/artist collections that don't match our product catalog
-const RELEVANT_COLLECTIONS = new Set([
-  'new-arrivals',
-  't-shirts',
-  'hoodies',
-  'men',
-  'women',
-  'unisex',
-  'tops',
-  'bottoms',
-  'accessories',
-  'featured',
-  'shoes',
-  'all',
-  'apparel',
-  'footwear',
-  'outerwear',
-]);
+// Collection type with product count
+interface CollectionWithProducts {
+  id: string;
+  title: string;
+  handle: string;
+  image?: {
+    id: string;
+    url: string;
+    altText?: string;
+    width?: number;
+    height?: number;
+  };
+  products: {
+    nodes: Array<{id: string}>;
+  };
+}
 
-export async function loader({context, request}: LoaderArgs) {
-  // Fetch more collections to account for filtering
+export async function loader({context}: LoaderArgs) {
   const {collections: allCollections} = await context.storefront.query(
     COLLECTIONS_QUERY,
     {
@@ -32,24 +27,12 @@ export async function loader({context, request}: LoaderArgs) {
     },
   );
 
-  // Filter to only relevant collections
+  // Filter to only collections that have products
   const filteredNodes = allCollections.nodes.filter(
-    (collection: CollectionFragment) =>
-      RELEVANT_COLLECTIONS.has(collection.handle),
+    (collection: CollectionWithProducts) => collection.products.nodes.length > 0,
   );
 
-  // Create a filtered connection object for the component
-  const collections = {
-    nodes: filteredNodes,
-    pageInfo: {
-      hasNextPage: false,
-      hasPreviousPage: false,
-      startCursor: null,
-      endCursor: null,
-    },
-  };
-
-  return json({collections});
+  return json({collections: filteredNodes});
 }
 
 export default function Collections() {
@@ -58,12 +41,16 @@ export default function Collections() {
   return (
     <div className="collections-page">
       <h1>Collections</h1>
-      <CollectionsGrid collections={collections.nodes} />
+      <CollectionsGrid collections={collections} />
     </div>
   );
 }
 
-function CollectionsGrid({collections}: {collections: CollectionFragment[]}) {
+function CollectionsGrid({
+  collections,
+}: {
+  collections: CollectionWithProducts[];
+}) {
   return (
     <div className="collections-grid">
       {collections.map((collection, index) => (
@@ -81,7 +68,7 @@ function CollectionItem({
   collection,
   index,
 }: {
-  collection: CollectionFragment;
+  collection: CollectionWithProducts;
   index: number;
 }) {
   return (
@@ -105,40 +92,28 @@ function CollectionItem({
 }
 
 const COLLECTIONS_QUERY = `#graphql
-  fragment Collection on Collection {
-    id
-    title
-    handle
-    image {
-      id
-      url
-      altText
-      width
-      height
-    }
-  }
   query StoreCollections(
     $country: CountryCode
-    $endCursor: String
     $first: Int
     $language: LanguageCode
-    $last: Int
-    $startCursor: String
   ) @inContext(country: $country, language: $language) {
-    collections(
-      first: $first,
-      last: $last,
-      before: $startCursor,
-      after: $endCursor
-    ) {
+    collections(first: $first) {
       nodes {
-        ...Collection
-      }
-      pageInfo {
-        hasNextPage
-        hasPreviousPage
-        startCursor
-        endCursor
+        id
+        title
+        handle
+        image {
+          id
+          url
+          altText
+          width
+          height
+        }
+        products(first: 1) {
+          nodes {
+            id
+          }
+        }
       }
     }
   }
