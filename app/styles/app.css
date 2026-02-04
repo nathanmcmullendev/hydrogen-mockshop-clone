@@ -986,11 +986,17 @@ main {
   transition: transform 0.3s ease, opacity 0.4s ease-out;
 }
 
-/* Image reveal animation - starts hidden, fades in on load */
+/* Image reveal animation - visible by default, animation is progressive enhancement */
 .product-image,
 .product-main-image {
-  opacity: 0;
+  opacity: 1;
   transition: opacity 0.3s ease-in-out;
+}
+
+/* When JS adds .loading class before load, start hidden for fade effect */
+.product-image.loading,
+.product-main-image.loading {
+  opacity: 0;
 }
 
 .product-image.loaded,
