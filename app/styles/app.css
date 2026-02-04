@@ -1170,24 +1170,6 @@ main {
   background: transparent;
 }
 
-/* Product image container needs relative positioning for blur placeholder */
-.product-image {
-  position: relative;
-  overflow: hidden;
-}
-
-/* Blur placeholder transitions out smoothly */
-.product-image-placeholder-blur {
-  transition: opacity 0.3s ease-out;
-  z-index: 1;
-}
-
-/* Main image sits above blur placeholder */
-.product-main-image {
-  position: relative;
-  z-index: 2;
-}
-
 /* Product Image Zoom Icon */
 .product-image-zoom {
   position: absolute;
