@@ -22,11 +22,30 @@ import {
   getOptimizedImageUrl,
   getSrcSet,
   getSizes,
+  getLqipUrl,
   IMAGE_SIZES,
 } from '~/utils/images';
 
 export const meta: V2_MetaFunction = ({data}) => {
-  return [{title: `Mock.shop | ${data?.product?.title ?? 'Product'}`}];
+  const product = data?.product;
+  const imageUrl = product?.selectedVariant?.image?.url;
+
+  // Preload the main product image for faster LCP
+  const preloadLinks = imageUrl ? [
+    {
+      tagName: 'link',
+      rel: 'preload',
+      as: 'image',
+      href: getOptimizedImageUrl(imageUrl, IMAGE_SIZES.preview),
+      imageSrcSet: getSrcSet(imageUrl, [400, 600, 800, 1200]),
+      imageSizes: '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 50vw',
+    },
+  ] : [];
+
+  return [
+    {title: `Mock.shop | ${product?.title ?? 'Product'}`},
+    ...preloadLinks,
+  ];
 };
 
 export async function loader({params, request, context}: LoaderArgs) {
@@ -144,6 +163,8 @@ function ProductImage({image}: {image: ProductVariantFragment['image']}) {
 
   // Generate Cloudinary optimized URLs
   const imageUrl = image.url;
+  // LQIP (Low Quality Image Placeholder) - tiny blurred version (~1KB)
+  const lqipUrl = getLqipUrl(imageUrl);
   const imageSrc = getOptimizedImageUrl(imageUrl, IMAGE_SIZES.preview);
   const imageSrcSet = getSrcSet(imageUrl, [400, 600, 800, 1200]);
   const imageSizes = getSizes({
@@ -169,6 +190,24 @@ function ProductImage({image}: {image: ProductVariantFragment['image']}) {
             <path d="M8 11h6"></path>
           </svg>
         </button>
+        {/* Blur placeholder - shows instantly while main image loads */}
+        {!isLoaded && (
+          <img
+            src={lqipUrl}
+            alt=""
+            aria-hidden="true"
+            className="product-image-placeholder-blur"
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              filter: 'blur(20px)',
+              transform: 'scale(1.1)',
+            }}
+          />
+        )}
         <img
           ref={imgRef}
           src={imageSrc}
