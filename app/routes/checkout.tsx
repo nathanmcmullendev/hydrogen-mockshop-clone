@@ -1,5 +1,5 @@
 import {json, redirect, type LoaderArgs} from '@shopify/remix-oxygen';
-import {useLoaderData, useNavigate, useFetcher} from '@remix-run/react';
+import {useLoaderData, useNavigate, useFetcher, Link} from '@remix-run/react';
 import {useState, useEffect} from 'react';
 import {Money, Image} from '@shopify/hydrogen';
 import {loadStripe} from '@stripe/stripe-js';
@@ -549,30 +549,43 @@ function OrderSummary({cart}: {cart: CartApiQueryFragment}) {
     <div className="order-summary">
       <h3>Order Summary</h3>
       <div className="order-items">
-        {cart.lines.nodes.map((line: any) => (
-          <div key={line.id} className="order-item">
-            <div className="order-item-image">
-              {line.merchandise.image && (
-                <Image
-                  data={line.merchandise.image}
-                  width={64}
-                  height={64}
-                  alt={line.merchandise.product.title}
-                />
-              )}
-              <span className="order-item-quantity">{line.quantity}</span>
+        {cart.lines.nodes.map((line: any) => {
+          const productHandle = line.merchandise.product.handle;
+          return (
+            <div key={line.id} className="order-item">
+              <Link
+                to={`/products/${productHandle}`}
+                className="order-item-image"
+              >
+                {line.merchandise.image && (
+                  <Image
+                    data={line.merchandise.image}
+                    width={64}
+                    height={64}
+                    alt={line.merchandise.product.title}
+                  />
+                )}
+                {line.quantity > 1 && (
+                  <span className="order-item-quantity">{line.quantity}</span>
+                )}
+              </Link>
+              <div className="order-item-details">
+                <Link
+                  to={`/products/${productHandle}`}
+                  className="order-item-title"
+                >
+                  {line.merchandise.product.title}
+                </Link>
+                {line.merchandise.title !== 'Default Title' && (
+                  <p className="order-item-variant">{line.merchandise.title}</p>
+                )}
+              </div>
+              <div className="order-item-price">
+                <Money data={line.cost.totalAmount} />
+              </div>
             </div>
-            <div className="order-item-details">
-              <p className="order-item-title">{line.merchandise.product.title}</p>
-              {line.merchandise.title !== 'Default Title' && (
-                <p className="order-item-variant">{line.merchandise.title}</p>
-              )}
-            </div>
-            <div className="order-item-price">
-              <Money data={line.cost.totalAmount} />
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
       <div className="order-totals">
         <div className="order-total-row">
