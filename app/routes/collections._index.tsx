@@ -1,16 +1,53 @@
 import {useLoaderData, Link} from '@remix-run/react';
 import {json, type LoaderArgs} from '@shopify/remix-oxygen';
-import {Pagination, getPaginationVariables, Image} from '@shopify/hydrogen';
+import {Image} from '@shopify/hydrogen';
 import type {CollectionFragment} from 'storefrontapi.generated';
 
-export async function loader({context, request}: LoaderArgs) {
-  const paginationVariables = getPaginationVariables(request, {
-    pageBy: 8,
-  });
+// Whitelist of relevant collection handles for the storefront
+// Filter out art/artist collections that don't match our product catalog
+const RELEVANT_COLLECTIONS = new Set([
+  'new-arrivals',
+  't-shirts',
+  'hoodies',
+  'men',
+  'women',
+  'unisex',
+  'tops',
+  'bottoms',
+  'accessories',
+  'featured',
+  'shoes',
+  'all',
+  'apparel',
+  'footwear',
+  'outerwear',
+]);
 
-  const {collections} = await context.storefront.query(COLLECTIONS_QUERY, {
-    variables: paginationVariables,
-  });
+export async function loader({context, request}: LoaderArgs) {
+  // Fetch more collections to account for filtering
+  const {collections: allCollections} = await context.storefront.query(
+    COLLECTIONS_QUERY,
+    {
+      variables: {first: 100},
+    },
+  );
+
+  // Filter to only relevant collections
+  const filteredNodes = allCollections.nodes.filter(
+    (collection: CollectionFragment) =>
+      RELEVANT_COLLECTIONS.has(collection.handle),
+  );
+
+  // Create a filtered connection object for the component
+  const collections = {
+    nodes: filteredNodes,
+    pageInfo: {
+      hasNextPage: false,
+      hasPreviousPage: false,
+      startCursor: null,
+      endCursor: null,
+    },
+  };
 
   return json({collections});
 }
@@ -21,19 +58,7 @@ export default function Collections() {
   return (
     <div className="collections-page">
       <h1>Collections</h1>
-      <Pagination connection={collections}>
-        {({nodes, isLoading, PreviousLink, NextLink}) => (
-          <>
-            <PreviousLink>
-              {isLoading ? 'Loading...' : <span>↑ Load previous</span>}
-            </PreviousLink>
-            <CollectionsGrid collections={nodes} />
-            <NextLink className="load-more">
-              {isLoading ? 'Loading...' : <span>Load more ↓</span>}
-            </NextLink>
-          </>
-        )}
-      </Pagination>
+      <CollectionsGrid collections={collections.nodes} />
     </div>
   );
 }
