@@ -144,15 +144,23 @@ function ProductImage({image}: {image: ProductVariantFragment['image']}) {
 
   // Generate Cloudinary optimized URLs
   const imageUrl = image.url;
-  const imageSrc = getOptimizedImageUrl(imageUrl, IMAGE_SIZES.preview);
+  // Use thumbnail size as initial src - same as catalog/quick view, likely cached
+  const imageSrc = getOptimizedImageUrl(imageUrl, IMAGE_SIZES.thumbnail);
+  // Browser picks from srcset based on display size - larger images load progressively
   const imageSrcSet = getSrcSet(imageUrl, [400, 600, 800, 1200]);
   const imageSizes = getSizes({
     '(max-width: 640px)': '100vw',
     '(max-width: 1024px)': '50vw',
     default: '50vw',
   });
-  // Full resolution for lightbox
+  // Full resolution for lightbox - preload in background
   const lightboxUrl = getOptimizedImageUrl(imageUrl, IMAGE_SIZES.full);
+
+  // Preload full-res image in background for zoom
+  useEffect(() => {
+    const img = new Image();
+    img.src = lightboxUrl;
+  }, [lightboxUrl]);
 
   return (
     <>
