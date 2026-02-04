@@ -5,13 +5,18 @@ import {useLoaderData, Link, useSearchParams, useSubmit} from '@remix-run/react'
 import {
   Pagination,
   getPaginationVariables,
-  Image,
   Money,
 } from '@shopify/hydrogen';
 import type {ProductItemFragment} from 'storefrontapi.generated';
 import {useVariantUrl} from '~/utils';
 import {WishlistButton} from '~/components/Wishlist';
 import {ProductQuickView, QuickViewButton} from '~/components/ProductQuickView';
+import {
+  getOptimizedImageUrl,
+  getSrcSet,
+  getSizes,
+  IMAGE_SIZES,
+} from '~/utils/images';
 
 /**
  * All Products Page
@@ -168,6 +173,15 @@ function ProductsGrid({
   );
 }
 
+/**
+ * ProductItem - Optimized product card with Cloudinary images
+ *
+ * Features:
+ * - Native <img> with srcset for responsive loading
+ * - Priority loading for above-fold images
+ * - fetchpriority hint for browser scheduling
+ * - Image reveal animation
+ */
 function ProductItem({
   product,
   loading,
@@ -177,8 +191,25 @@ function ProductItem({
   loading?: 'eager' | 'lazy';
   onQuickView: (handle: string) => void;
 }) {
+  const [isLoaded, setIsLoaded] = useState(false);
   const variant = product.variants.nodes[0];
   const variantUrl = useVariantUrl(product.handle, variant.selectedOptions);
+  const priority = loading === 'eager';
+
+  // Generate optimized image URLs via Cloudinary
+  const imageUrl = product.featuredImage?.url;
+  const imageSrc = imageUrl
+    ? getOptimizedImageUrl(imageUrl, IMAGE_SIZES.thumbnail)
+    : '';
+  const imageSrcSet = imageUrl
+    ? getSrcSet(imageUrl, [200, 400, 600, 800])
+    : '';
+  const imageSizes = getSizes({
+    '(max-width: 640px)': '50vw',
+    '(max-width: 1024px)': '33vw',
+    default: '25vw',
+  });
+
   return (
     <div className="product-item-wrapper">
       <div className="product-item-image-container">
@@ -188,14 +219,22 @@ function ProductItem({
           prefetch="intent"
           to={variantUrl}
         >
-          {product.featuredImage && (
-            <Image
-              alt={product.featuredImage.altText || product.title}
-              aspectRatio="1/1"
-              data={product.featuredImage}
-              loading={loading}
-              sizes="(min-width: 45em) 400px, 100vw"
+          {imageUrl ? (
+            <img
+              src={imageSrc}
+              srcSet={imageSrcSet}
+              sizes={imageSizes}
+              alt={product.featuredImage?.altText || product.title}
+              loading={priority ? 'eager' : 'lazy'}
+              fetchPriority={priority ? 'high' : 'auto'}
+              width={400}
+              height={400}
+              onLoad={() => setIsLoaded(true)}
+              className={`product-image ${isLoaded ? 'loaded' : ''}`}
+              style={{aspectRatio: '1/1', objectFit: 'cover'}}
             />
+          ) : (
+            <div className="product-image-placeholder" />
           )}
         </Link>
         <WishlistButton
