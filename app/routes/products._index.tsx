@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useState, useEffect, useRef} from 'react';
 import type {V2_MetaFunction} from '@shopify/remix-oxygen';
 import {json, type LoaderArgs} from '@shopify/remix-oxygen';
 import {useLoaderData, Link, useSearchParams, useSubmit} from '@remix-run/react';
@@ -192,9 +192,17 @@ function ProductItem({
   onQuickView: (handle: string) => void;
 }) {
   const [isLoaded, setIsLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
   const variant = product.variants.nodes[0];
   const variantUrl = useVariantUrl(product.handle, variant.selectedOptions);
   const priority = loading === 'eager';
+
+  // Check if image is already loaded (cached) on mount
+  useEffect(() => {
+    if (imgRef.current?.complete) {
+      setIsLoaded(true);
+    }
+  }, []);
 
   // Generate optimized image URLs via Cloudinary
   const imageUrl = product.featuredImage?.url;
@@ -221,6 +229,7 @@ function ProductItem({
         >
           {imageUrl ? (
             <img
+              ref={imgRef}
               src={imageSrc}
               srcSet={imageSrcSet}
               sizes={imageSizes}

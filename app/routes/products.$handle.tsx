@@ -1,4 +1,4 @@
-import React, {Suspense, useState} from 'react';
+import React, {Suspense, useState, useEffect, useRef} from 'react';
 import type {V2_MetaFunction} from '@shopify/remix-oxygen';
 import {defer, redirect, type LoaderArgs} from '@shopify/remix-oxygen';
 import type {FetcherWithComponents} from '@remix-run/react';
@@ -129,6 +129,14 @@ export default function Product() {
 function ProductImage({image}: {image: ProductVariantFragment['image']}) {
   const [isZoomed, setIsZoomed] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  // Check if image is already loaded (cached) on mount
+  useEffect(() => {
+    if (imgRef.current?.complete) {
+      setIsLoaded(true);
+    }
+  }, []);
 
   if (!image) {
     return <div className="product-image" />;
@@ -162,6 +170,7 @@ function ProductImage({image}: {image: ProductVariantFragment['image']}) {
           </svg>
         </button>
         <img
+          ref={imgRef}
           src={imageSrc}
           srcSet={imageSrcSet}
           sizes={imageSizes}

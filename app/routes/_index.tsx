@@ -1,7 +1,7 @@
 import type {V2_MetaFunction} from '@shopify/remix-oxygen';
 import {defer, type LoaderArgs} from '@shopify/remix-oxygen';
 import {Await, useLoaderData, Link} from '@remix-run/react';
-import {Suspense, useState} from 'react';
+import {Suspense, useState, useEffect, useRef} from 'react';
 import {Money} from '@shopify/hydrogen';
 import type {
   FeaturedCollectionFragment,
@@ -202,9 +202,18 @@ function ProductImage({
   priority: boolean;
 }) {
   const [isLoaded, setIsLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  // Check if image is already loaded (cached) on mount
+  useEffect(() => {
+    if (imgRef.current?.complete) {
+      setIsLoaded(true);
+    }
+  }, []);
 
   return (
     <img
+      ref={imgRef}
       src={src}
       srcSet={srcSet}
       sizes={sizes}
