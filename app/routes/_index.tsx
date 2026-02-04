@@ -53,16 +53,17 @@ export default function Homepage() {
   const data = useLoaderData<typeof loader>();
   const [quickViewHandle, setQuickViewHandle] = useState<string | null>(null);
 
-  // If CMS content exists, use it
-  if (hasRouteContent(data.route)) {
-    return (
-      <div className="home">
-        <RouteContent route={data.route} />
-      </div>
-    );
-  }
+  // TODO: Re-enable CMS when metaobjects are fully configured
+  // For now, always use the static homepage which has proper hero image and products
+  // if (hasRouteContent(data.route)) {
+  //   return (
+  //     <div className="home">
+  //       <RouteContent route={data.route} />
+  //     </div>
+  //   );
+  // }
 
-  // Otherwise, render the static homepage
+  // Render the static homepage
   return (
     <div className="home">
       <HeroSection />
