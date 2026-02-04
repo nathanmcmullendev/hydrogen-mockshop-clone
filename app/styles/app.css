@@ -1671,7 +1671,12 @@ main {
   margin: 0;
 }
 
-.cart-checkout-button {
+.cart-checkout-button,
+a.cart-checkout-button,
+a.cart-checkout-button:link,
+a.cart-checkout-button:visited,
+a.cart-checkout-button:hover,
+a.cart-checkout-button:active {
   display: block;
   width: 100%;
   background: var(--color-text);
